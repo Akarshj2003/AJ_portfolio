@@ -9,15 +9,12 @@ function IntroAnimation({ onFinish }) {
         "Hello",
         "Hola",
         "Bonjour",
-        "Hallo",
         "Olá",
         "Здравствуйте",
         "你好",
         "안녕하세요",
         "Hello",
         "مرحبا",
-        "Γειά σας",
-        "Cześć",
         "Hei",
         "שלום",
         "こんにちは",
@@ -83,7 +80,7 @@ function IntroAnimation({ onFinish }) {
                             src={logoIntro}
                             autoPlay
                             muted
-                            className="w-[40%] h-auto object-contain"
+                            className="w-[60%] h-auto object-contain"
                             initial={{ opacity: 1 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}

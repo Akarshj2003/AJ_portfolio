@@ -9,9 +9,10 @@ const icons = [
   { icon: FaLinkedin, label: 'LinkedIn', link: 'https://www.linkedin.com/in/akarshj2003' }
 ]
 const glowVarients = {
-  initial: { scale: 1, y: 0, 
+  initial: {
+    scale: 1, y: 0,
     filter: "drop-shadow(0 0 0px #0000) drop-shadow(0 0 0px #0000) drop-shadow(0 0 0px #0000)"
-   },
+  },
   hover: {
     scale: 1.2, y: -4,
     filter:
@@ -174,47 +175,48 @@ const Home = () => {
 
         </div>
 
-          <div
+        <div
           className='relative hidden lg:block'>
-            <motion.div 
+          <motion.div
             className='absolute top-[8%] pointer-events-none'
             style={
-              {right:"5vh",
-                width:"min(20vw,410px)",
-                height:"min(80vh,760px)",
-                borderRadius:"50%",
-                filter:"blur(40px)",opacity:"0.22",
-                background:"conic-gradient(from 0deg ,#00f4ff, #00f4ff,#00f4ff , #00f4ff )"
+              {
+                right: "5vh",
+                width: "min(20vw,410px)",
+                height: "min(80vh,760px)",
+                borderRadius: "50%",
+                filter: "blur(40px)", opacity: "0.22",
+                background: "conic-gradient(from 0deg ,#00f4ff, #00f4ff,#00f4ff , #00f4ff )"
               }
             }
-            initial={{opacity:0,scale:0.98,y:40}}
-            animate={{opacity:0.22,scale:1,}}
-            transition={{duration:1,delay:0.6}}
+            initial={{ opacity: 0, scale: 0.98, y: 40 }}
+            animate={{ opacity: 0.22, scale: 1, }}
+            transition={{ duration: 1, delay: 0.6 }}
 
-            />
-            <motion.img src={avatar} alt='aka'
+          />
+          <motion.img src={avatar} alt='aka'
             className='absolute top-1/2 -translate-y-1/2 object-contain select-none '
             style={
               {
-                right:"-30px",width:"min(45w,780px)",maxHeight:"90vh"
+                right: "-30px", width: "min(45w,780px)", maxHeight: "90vh"
 
               }
             }
-            initial={{opacity:0,scale:0.98,y:40}}
+            initial={{ opacity: 0, scale: 0.98, y: 40 }}
             animate={{
-              opacity:1,
-              scale:1,
-              y:[0,-10,0],
-              
+              opacity: 1,
+              scale: 1,
+              y: [0, -10, 0],
+
 
             }}
             transition={{
-              opacity:{duration:0.8,delay:0.2},
-              y:{duration:4,delay:1,repeat:Infinity,repeatType:"mirror",ease:"easeInOut"},
+              opacity: { duration: 0.8, delay: 0.2 },
+              y: { duration: 4, delay: 1, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" },
             }}
 
-            />
-          </div>
+          />
+        </div>
 
       </div>
 
