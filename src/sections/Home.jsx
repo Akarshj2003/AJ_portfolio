@@ -140,7 +140,7 @@ const Home = () => {
 
               {/* MY RESUME */}
               <a
-                href="/resume.pdf"
+                href="https://akarshj2003.github.io/AJ_portfolio/resume.pdf"
                 download
                 className="px-6 py-3 rounded-full border-2 border-[#00f4ff] text-white font-semibold hover:bg-[#00f4ff]/10 hover:shadow-[0_0_15px_#00f4ff] hover:scale-105 transition-transform duration-300"
               >
