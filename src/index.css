@@ -30,3 +30,20 @@ h2 {
 .animate-blink {
   animation: blink 1s step-start infinite;
 }
+
+
+
+.animate-bounce-slow {
+  animation: bounce-slow 2.4s ease-in-out infinite;
+}
+@keyframes jump-spring {
+  0%   { transform: translateY(0); }
+  20%  { transform: translateY(-14px); } /* quick jump */
+  40%  { transform: translateY(3px); }   /* spring down */
+  60%  { transform: translateY(-6px); }  /* mini bounce */
+  100% { transform: translateY(0); }
+}
+
+.animate-jump {
+  animation: jump-spring 2s ease-in-out infinite;
+}

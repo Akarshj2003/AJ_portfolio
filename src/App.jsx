@@ -10,11 +10,14 @@ import Footer from './sections/Footer.jsx'
 import Home from './sections/Home.jsx'
 import Skills from './sections/Skills.jsx'
 import IntroAnimation from './components/IntroAnimation.jsx'
+import ChatToggleButton from './components/ChatToggleButton.jsx'
+import ChatWindow from './components/ChatWindow.jsx'
 
 
 function App() {
 
   const [introDone ,setIntroDone]=React.useState(false);
+  const [isChatOpen, setIsChatOpen] =React.useState(false);
 
   return (
     <>
@@ -24,7 +27,6 @@ function App() {
 
    <div  className="relative gradient text-white overflow-x-hidden scroll-smooth" >
    {/* <Particles/>*/}
-   
     <Cursor/>
 
     <Navbar/>
@@ -34,6 +36,12 @@ function App() {
     <Projects/>
     <Contacts/>
     <Footer/>
+    {!isChatOpen && (
+      <ChatToggleButton onOpen={() => setIsChatOpen(true)} />
+    )}
+    {isChatOpen && (
+      <ChatWindow onClose={() => setIsChatOpen(false)} />
+    )}
 
    </div>
    )}
