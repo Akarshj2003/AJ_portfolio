@@ -10,7 +10,6 @@ function ChatWindow({ onClose }) {
     { 
       id: 1, 
       sender: 'bot', 
-      // <-- MODIFIED: Using two spaces followed by \n (  \n) for clean line breaks in Markdown
       text: "Hey there! I’m Akarsh’s multi-agent AI assistant—powered by Gemini, fueled by caffeine, and trained to act smarter than I look.  \nI can dig through Akarsh’s documents using RAG, help you write a perfect email to him,  \nor just vibe with your questions.  \nSo… what mission are we running today? 🚀" 
     }
   ]);
@@ -25,6 +24,19 @@ function ChatWindow({ onClose }) {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // --- MODIFIED FUNCTION ---
+  // A helper function to guarantee the "Thinking..." message is replaced
+  const replaceThinkingMessage = (id, newText) => {
+    setMessages(prevMessages => 
+      prevMessages.map(msg => 
+        msg.id === id 
+          ? { ...msg, text: newText } 
+          : msg
+      )
+    );
+  };
+  // -------------------------
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -63,25 +75,17 @@ function ChatWindow({ onClose }) {
 
       const data = await response.json();
       
+      // Update history first
       setChatHistory(data.history);
       
-      setMessages(prev => 
-        prev.map(msg => 
-          msg.id === thinkingId // Find by unique ID
-            ? { ...msg, text: data.answer } 
-            : msg
-        )
-      );
+      // Use the dedicated replacement function
+      replaceThinkingMessage(thinkingId, data.answer);
 
     } catch (error) {
       console.error('Error fetching response:', error);
-      setMessages(prev => 
-        prev.map(msg => 
-          msg.id === thinkingId // Find by unique ID
-            ? { ...msg, text: 'Ouch! I hit a snag. Try asking that again, maybe in a different way?' } 
-            : msg
-        )
-      );
+      // Use the dedicated replacement function for errors
+      replaceThinkingMessage(thinkingId, 'Ouch! I hit a snag. Try asking that again, maybe in a different way?');
+      
     } finally {
       setIsLoading(false);
     }
@@ -106,11 +110,11 @@ function ChatWindow({ onClose }) {
   return (
     // This is the outer "frame" div, handling positioning and responsive width
     <div className="fixed z-50 bottom-0 right-0 h-[90%] w-full 
-                   sm:w-full md:w-[80%] lg:w-[50%] 
-                    sm:bottom-6 sm:right-6 
-                   flex flex-col bg-gray-900 text-white 
-                   rounded-t-lg sm:rounded-lg shadow-xl 
-                   border border-gray-700 overflow-hidden">
+    	 sm:w-[90%] md:w-[80%] lg:w-[50%] 
+    	 sm:bottom-6 sm:right-6 
+    	 flex flex-col bg-gray-900 text-white 
+    	 rounded-t-lg sm:rounded-lg shadow-xl 
+    	 border border-gray-700 overflow-hidden">
       
       {/* This inner div handles the flex layout */}
       <div className="w-full h-full flex flex-col bg-gray-900 text-white shadow-xl">
