@@ -18,7 +18,26 @@ function ChatWindow({ onClose }) {
     }
   ]);
   const [isLoading, setIsLoading] = useState(false);
-  const [chatHistory, setChatHistory] = useState([]);
+  const [chatHistory, setChatHistory] = useState([
+  {
+    role: "user",
+    parts: [
+      {
+        text: "From now on, reply in a friendly tone and use emojis in the chat."
+      }
+    ]
+  },
+  {
+    role: "model",
+    parts: [
+      {
+        text: "🌟 Got it! I'll reply in a friendly tone and use emojis to keep things fun and warm! 😊🔥"
+      }
+    ]
+  }
+]);
+
+
   const messagesEndRef = useRef(null);
 
   // WhatsApp style textarea auto-grow
@@ -108,6 +127,7 @@ function ChatWindow({ onClose }) {
       }
 
       const data = await response.json();
+      console.log(data.history)
 
       setChatHistory(data.history);
       replaceThinkingMessage(thinkingId, data.answer);
