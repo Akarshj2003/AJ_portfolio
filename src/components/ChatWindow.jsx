@@ -127,6 +127,7 @@ function ChatWindow({ onClose }) {
       }
 
       const data = await response.json();
+      console.log(data);
 
       setChatHistory(data.history);
       replaceThinkingMessage(thinkingId, data.answer);
