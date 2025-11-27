@@ -1,5 +1,5 @@
 import React from 'react'
-import {motion} from 'framer-motion'
+import {motion,useAnimation} from 'framer-motion'
 import Profile from "../assets/Profile.jpg"
 import Profile2 from "../assets/Profile2.jpg"
 
@@ -17,7 +17,15 @@ const About = () => {
         "bottem-0 right-10 w-[420px] h-[420px] opacity-15 blur-[140px] delay-300",
         "top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[220px] h-[220px] opacity-10 blur-[110px]"
     ]
+    const controls = useAnimation();
 
+    const handleMouseEnter = () => {
+        controls.start({ rotateY: 180 });
+    };
+
+    const handleMouseLeave = () => {
+        controls.start({ rotateY: 0 });
+    };
 
     return (
         <section 
@@ -40,12 +48,15 @@ const About = () => {
                 viewport={{once:true,amount:0.4}}
                 >
                     <motion.div
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
                     className='
                     relative w-40 h-40 md:h-[200px] md:w-[200px] rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-br from-[#1cd8d2]/20 to-[#302b63]/20 border border-[#1cd8d2]/20 perspective-1000'
                     >
                         <motion.div
                         initial={{rotateY:0}}
-                        whileHover={{rotateY:180}}
+                        //whileHover={{rotateY:180}}
+                        animate={controls}
                         transition={{
                             type:"spring",
                             stiffness:90,
