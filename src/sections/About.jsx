@@ -1,6 +1,7 @@
 import React from 'react'
 import {motion} from 'framer-motion'
 import Profile from "../assets/Profile.jpg"
+import Profile2 from "../assets/Profile2.jpg"
 
 const About = () => {
 
@@ -40,10 +41,36 @@ const About = () => {
                 >
                     <motion.div
                     className='
-                    relative w-40 h-40 md:h-[200px] md:w-[200px] rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-br from-[#1cd8d2]/20 to-[#302b63]/20 border border-[#1cd8d2]/20 '
+                    relative w-40 h-40 md:h-[200px] md:w-[200px] rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-br from-[#1cd8d2]/20 to-[#302b63]/20 border border-[#1cd8d2]/20 perspective-1000'
                     >
-                        <img src= {Profile} alt="profile"
-                        className='absolute inset-0'/>
+                        <motion.div
+                        initial={{rotateY:0}}
+                        whileHover={{rotateY:180}}
+                        transition={{
+                            type:"spring",
+                            stiffness:90,
+                            damping:12,
+                            duration:0.8,
+
+                        }}
+                        className='relative w-full h-full'
+                        style={{transformStyle:"preserve-3d"}}>
+                            <img
+                            src={Profile}
+                            alt='profile'
+                            className='absolute inset-0  backface-hidden object-cover'
+                            style={{backfaceVisibility:"hidden"}}/>
+                             <img
+                            src={Profile2}
+                            alt='profile'
+                            className='absolute inset-0  backface-hidden object-cover'
+                            style={{backfaceVisibility:"hidden",
+                                transform:"rotatey(180deg)"
+                            }}/>
+
+
+                        </motion.div>
+
                     </motion.div>
                     <div
                     className='flex-1 flex flex-col justify-center md:text-left'
