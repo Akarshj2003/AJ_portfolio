@@ -23,7 +23,7 @@ function ChatWindow({ onClose }) {
     role: "user",
     parts: [
       {
-        text: "From now on, reply in a friendly tone and use emojis in the chat."
+        text: "reply in a friendly tone and use emojis sometimes in the chat ."
       }
     ]
   },
@@ -31,7 +31,7 @@ function ChatWindow({ onClose }) {
     role: "model",
     parts: [
       {
-        text: "🌟 Got it! I'll reply in a friendly tone and use emojis to keep things fun and warm! 😊🔥"
+        text: "🌟 Got it! I'll reply in a friendly tone and use emojis to keep things fun and warm! 😊"
       }
     ]
   }

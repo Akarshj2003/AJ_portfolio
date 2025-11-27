@@ -17,6 +17,13 @@ const glowVariants = {
     }
   },
 
+  reset: {
+    scale: 1,
+    y: 0,
+    filter: "drop-shadow(0 0 0px transparent)",
+    transition: { duration: 0.2 } 
+  },
+
   hover: {
     scale: 1.25,
     y: -6,
@@ -24,10 +31,12 @@ const glowVariants = {
     transition: { type: "spring", stiffness: 300, damping: 15 }
   },
 
+
   tap: {
     scale: 0.9,
     transition: { duration: 0.1 }
   }
+
 };
 
 function ChatToggleButton({ onOpen }) {
@@ -48,7 +57,7 @@ function ChatToggleButton({ onOpen }) {
       onClick={(e) => { e.preventDefault(); onOpen(); }}
 
       // This runs the glow only when idle
-      animate={isIdle ? "idleGlow" : ""}
+      animate={isIdle ? "idleGlow" : "reset"}
       whileHover="hover"
       whileTap="tap"
 
