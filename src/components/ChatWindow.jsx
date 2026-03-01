@@ -1,4 +1,4 @@
-// 1. Import 'useEffect' and 'useRef'
+// ChatWindow.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { IoClose } from "react-icons/io5";
 import { motion } from 'framer-motion';
@@ -6,57 +6,37 @@ import ReactMarkdown from 'react-markdown';
 
 function ChatWindow({ onClose }) {
 
-  // -------------------------------
-  // STATE
-  // -------------------------------
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState([
-    { 
+    {
       id: crypto.randomUUID(),
-      sender: 'bot', 
-      text: "Hey there! I'm Akarsh's multi-agent AI assistant—powered by Gemini, fueled by caffeine, and trained to act smarter than I look.  \nI can dig through Akarsh's documents using RAG, help you write a perfect email to him,  \nor just vibe with your questions.  \nSo… what mission are we running today? 🚀" 
+      sender: 'bot',
+      text: "Hey there! I'm Akarsh's multi-agent AI assistant—powered by Groq + Llama, fueled by caffeine, and trained to act smarter than I look. 🤖✨\n\nI can dig through Akarsh's documents using RAG, help you write a perfect email to him, or just vibe with your questions.\n\nSo… what mission are we running today? 🚀"
     }
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const [chatHistory, setChatHistory] = useState([
-  {
-    role: "user",
-    parts: [
-      {
-        text: "reply in a friendly tone and use emojis sometimes in the chat ."
-      }
-    ]
-  },
-  {
-    role: "model",
-    parts: [
-      {
-        text: "🌟 Got it! I'll reply in a friendly tone and use emojis to keep things fun and warm! 😊"
-      }
-    ]
-  }
-]);
+    { role: "user", content: "reply in a friendly tone and use emojis sometimes in the chat." },
+    { role: "assistant", content: "Got it! I'll keep things friendly and fun with emojis! 😊✨" }
+  ]);
 
+  // emailState stored in ref — never stale in async callbacks
+  const emailStateRef = useRef(null);
 
   const messagesEndRef = useRef(null);
-
-  // WhatsApp style textarea auto-grow
   const textareaRef = useRef(null);
 
-
-  // -------------------------------
-  // SCROLL TO BOTTOM
-  // -------------------------------
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
+  // Auto-focus textarea on mount
   useEffect(() => {
-    scrollToBottom();
+    textareaRef.current?.focus();
+  }, []);
+
+  // Auto-scroll to bottom on new messages
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-
-  // Auto-grow textarea
+  // Auto-grow textarea height
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
@@ -64,11 +44,7 @@ function ChatWindow({ onClose }) {
     }
   }, [input]);
 
-
-  // -------------------------------
-  // TIMEOUT WRAPPER
-  // -------------------------------
-  const fetchWithTimeout = (url, options = {}, timeout = 20000) => {
+  const fetchWithTimeout = (url, options = {}, timeout = 25000) => {
     return Promise.race([
       fetch(url, options),
       new Promise((_, reject) =>
@@ -77,34 +53,19 @@ function ChatWindow({ onClose }) {
     ]);
   };
 
-
-  // -------------------------------
-  // REPLACE THINKING MESSAGE
-  // -------------------------------
   const replaceThinkingMessage = (id, newText) => {
     setMessages(prev =>
-      prev.map(msg =>
-        msg.id === id ? { ...msg, text: newText } : msg
-      )
+      prev.map(msg => msg.id === id ? { ...msg, text: newText } : msg)
     );
   };
 
-
-  // -------------------------------
-  // HANDLE SUBMIT
-  // -------------------------------
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
 
     setIsLoading(true);
 
-    const userMessage = { 
-      id: crypto.randomUUID(), 
-      sender: 'user', 
-      text: input 
-    };
-
+    const userMessage = { id: crypto.randomUUID(), sender: 'user', text: input };
     const thinkingId = crypto.randomUUID();
     const thinkingMessage = { id: thinkingId, sender: 'bot', text: 'Thinking...' };
 
@@ -113,20 +74,30 @@ function ChatWindow({ onClose }) {
     const userInput = input;
     setInput('');
 
+    // Re-focus textarea immediately after clearing input
+    setTimeout(() => textareaRef.current?.focus(), 0);
+
+    const trimmedHistory = chatHistory.slice(-20);
+
     try {
       const API_URL = 'https://aj-backend.vercel.app/api/ask-gemini';
 
       const response = await fetchWithTimeout(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: userInput, history: chatHistory }),
+        body: JSON.stringify({
+          query: userInput,
+          history: trimmedHistory,
+          emailState: emailStateRef.current,
+        }),
       });
 
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
+      if (!response.ok) throw new Error('Network response was not ok');
 
       const data = await response.json();
+
+      // Update emailState ref immediately
+      emailStateRef.current = data.emailState || null;
 
       setChatHistory(data.history);
       replaceThinkingMessage(thinkingId, data.answer);
@@ -139,40 +110,35 @@ function ChatWindow({ onClose }) {
       );
     } finally {
       setIsLoading(false);
+      // Re-focus after response arrives too
+      setTimeout(() => textareaRef.current?.focus(), 100);
     }
   };
 
-
-  // -------------------------------
-  // MARKDOWN STYLES
-  // -------------------------------
   const markdownComponents = {
     p: ({ node, ...props }) => <p className="mb-2 last:mb-0" {...props} />,
     ul: ({ node, ...props }) => <ul className="list-disc pl-5 my-2" {...props} />,
     li: ({ node, ...props }) => <li className="mb-1" {...props} />,
     strong: ({ node, ...props }) => <strong className="font-semibold text-white" {...props} />,
-    code: ({ inline, ...props }) =>
+    code: ({ node, inline, className, children, ...props }) =>
       inline ? (
-        <code className="bg-gray-800 px-1.5 py-0.5 rounded-md font-mono text-sm" {...props} />
+        <code className="bg-gray-800 px-1.5 py-0.5 rounded-md font-mono text-sm" {...props}>
+          {children}
+        </code>
       ) : (
-        <code className="block w-full overflow-auto bg-gray-800 p-2 rounded-md font-mono text-sm" {...props} />
+        <pre className="block w-full overflow-auto bg-gray-800 p-2 rounded-md font-mono text-sm">
+          <code className={className} {...props}>{children}</code>
+        </pre>
       ),
-    pre: ({ node, ...props }) => (
-      <pre className="block w-full overflow-auto bg-gray-800 p-2 rounded-md font-mono text-sm" {...props} />
-    ),
   };
 
-
-  // -------------------------------
-  // UI RETURN
-  // -------------------------------
   return (
-    <div className="fixed z-50 bottom-0 right-0 h-[90%] w-full 
-    	 sm:w-[90%] md:w-[80%] lg:w-[50%] 
-    	 sm:bottom-6 sm:right-6 
-    	 flex flex-col bg-gray-900 text-white 
-    	 rounded-t-lg sm:rounded-lg shadow-xl 
-    	 border border-gray-700 overflow-hidden">
+    <div className="fixed z-50 bottom-0 right-0 h-[90%] w-full
+       sm:w-[90%] md:w-[80%] lg:w-[50%]
+       sm:bottom-6 sm:right-6
+       flex flex-col bg-gray-900 text-white
+       rounded-t-lg sm:rounded-lg shadow-xl
+       border border-gray-700 overflow-hidden">
 
       <div className="w-full h-full flex flex-col bg-gray-900 text-white shadow-xl">
 
@@ -216,7 +182,6 @@ function ChatWindow({ onClose }) {
 
         {/* Input */}
         <form onSubmit={handleSubmit} className="p-4 border-t border-gray-700 flex-shrink-0 flex gap-2 items-end">
-
           <textarea
             ref={textareaRef}
             value={input}
@@ -228,13 +193,12 @@ function ChatWindow({ onClose }) {
               }
             }}
             rows={1}
-            className="flex-1 max-h-32 px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg 
-              focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 
+            className="flex-1 max-h-32 px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg
+              focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50
               resize-none overflow-hidden"
             placeholder="Ask a question..."
             disabled={isLoading}
-          ></textarea>
-
+          />
           <button
             type="submit"
             className="px-4 py-2 bg-blue-600 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50"
@@ -242,7 +206,6 @@ function ChatWindow({ onClose }) {
           >
             {isLoading ? 'Wait...' : 'Send'}
           </button>
-
         </form>
 
       </div>
