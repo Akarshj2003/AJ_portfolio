@@ -83,7 +83,7 @@ function EmailProgress({ step }) {
 }
 
 // ── Project card renderer ───────────────────────────────────────
-function ProjectCard({ name, tech = [], description, link }) {
+function ProjectCard({ name, tech = [], description, link, homepage, stars, updatedAt }) {
   return (
     <motion.div
       initial={{ opacity:0, y:8 }}
@@ -98,9 +98,20 @@ function ProjectCard({ name, tech = [], description, link }) {
         width:'100%',
       }}
     >
-      <div style={{ fontWeight:700, color:'#fff', fontSize:14, marginBottom:4 }}>{name}</div>
+      {/* Header row */}
+      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:4 }}>
+        <div style={{ fontWeight:700, color:'#fff', fontSize:14 }}>{name}</div>
+        {stars > 0 && (
+          <span style={{ fontSize:11, color: GOLD, fontFamily:'monospace', whiteSpace:'nowrap', marginLeft:8 }}>
+            ⭐ {stars}
+          </span>
+        )}
+      </div>
+
       {description && <div style={{ fontSize:12, color:'#9CACA8', marginBottom:8, lineHeight:1.5 }}>{description}</div>}
-      <div style={{ display:'flex', flexWrap:'wrap', gap:5 }}>
+
+      {/* Tech tags */}
+      <div style={{ display:'flex', flexWrap:'wrap', gap:5, marginBottom:8 }}>
         {tech.map(t => (
           <span key={t} style={{
             fontSize:10, padding:'2px 8px', borderRadius:20,
@@ -109,12 +120,27 @@ function ProjectCard({ name, tech = [], description, link }) {
           }}>{t}</span>
         ))}
       </div>
-      {link && (
-        <a href={link} target="_blank" rel="noreferrer"
-          style={{ display:'inline-block', marginTop:8, fontSize:11, color: GOLD, textDecoration:'none' }}>
-          View project →
-        </a>
-      )}
+
+      {/* Footer row — links + updated */}
+      <div style={{ display:'flex', alignItems:'center', gap:12, flexWrap:'wrap' }}>
+        {link && (
+          <a href={link} target="_blank" rel="noreferrer"
+            style={{ fontSize:11, color: GOLD, textDecoration:'none' }}>
+            GitHub →
+          </a>
+        )}
+        {homepage && (
+          <a href={homepage} target="_blank" rel="noreferrer"
+            style={{ fontSize:11, color: CYAN, textDecoration:'none' }}>
+            Live demo →
+          </a>
+        )}
+        {updatedAt && (
+          <span style={{ fontSize:10, color:'#5A7A74', marginLeft:'auto' }}>
+            Updated {updatedAt}
+          </span>
+        )}
+      </div>
     </motion.div>
   );
 }
@@ -163,8 +189,9 @@ export default function ChatWindow({ onClose }) {
       "Hey! 👋 I'm Akarsh's AI assistant — ask me anything about him, his projects, or his experience.\n\nOr I can help you send him a message directly! 🚀",
     suggestions: pickSuggestions(new Set()),
   }]);
-  const [chatHistory, setChatHistory] = useState([]);
+  const [chatHistory, setChatHistory]   = useState([]);
   const [usedSuggestions] = useState(() => new Set());
+  const userProfileRef = useRef(null);  // tracks visitor profile silently
 
   const emailStateRef  = useRef(null);
   const messagesEndRef = useRef(null);
@@ -227,13 +254,15 @@ export default function ChatWindow({ onClose }) {
           query: q,
           history: chatHistory.slice(-20),
           emailState: emailStateRef.current,
+          userProfile: userProfileRef.current,
         }),
       });
 
       if (!res.ok) throw new Error('Network error');
       const data = await res.json();
 
-      emailStateRef.current = data.emailState || null;
+      emailStateRef.current  = data.emailState  || null;
+      userProfileRef.current  = data.userProfile || null;
       setChatHistory(data.history || []);
 
       // pick fresh suggestions (not used before, not same as current)
