@@ -75,9 +75,8 @@ const Navbar = () => {
                 </div>
                 <div className='hidden lg:block'>
                     <a href='#contact'
-                        className="bg-gradient-to-r from-yellow-500 to-red-500 text-white px-5 py-2 rounded-full font-medium shadow-[0_0_10px_rgba(255,255,100,0.4)] transition-all duration-300 
-                        hover:shadow-[0_0_25px_rgba(255,255,100,0.9)] hover:scale-105"
-
+                        className="bg-gradient-to-r from-[#ffc922] via-[#00f4ff] to-[#1cd8d2] text-black px-5 py-2 rounded-full font-bold shadow-[0_0_15px_rgba(0,244,255,0.35)] transition-all duration-300 
+                        hover:shadow-[0_0_25px_#00f4ff] hover:scale-105 active:scale-95"
                     >
                         REACH OUT
                     </a>
