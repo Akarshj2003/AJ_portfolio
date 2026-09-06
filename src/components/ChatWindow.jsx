@@ -247,7 +247,7 @@ function ProjectCard({ name, tech = [], description, link, homepage, stars, upda
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -2, borderColor: 'rgba(0, 244, 255, 0.4)' }}
       transition={{ duration: 0.2 }}
-      className="mt-3 p-3.5 rounded-xl border border-white/10 bg-slate-900/70 backdrop-blur-md transition-all shadow-lg hover:shadow-[0_0_20px_rgba(0,244,255,0.12)] text-left"
+      className="mt-3 p-3.5 rounded-xl border border-white/10 bg-slate-900/90 transition-all shadow-lg hover:shadow-[0_0_20px_rgba(0,244,255,0.12)] text-left"
     >
       <div className="flex justify-between items-start gap-2 mb-1.5">
         <div className="font-semibold text-white text-sm tracking-wide flex items-center gap-1.5">
@@ -361,30 +361,47 @@ export default function ChatWindow({ onClose }) {
   const scrollContainerRef = useRef(null);
   const inputRef = useRef(null);
   const isNearBottomRef = useRef(true);
+  const tickingRef = useRef(false);
 
-  // Lock background body scroll when in full-screen
+  // Lock background body scroll whenever ChatWindow is open (both half-screen & full-screen)
   useEffect(() => {
-    if (isFullScreen) {
-      const originalOverflow = document.body.style.overflow;
-      document.body.style.overflow = 'hidden';
-      return () => {
-        document.body.style.overflow = originalOverflow;
-      };
+    const originalOverflow = document.body.style.overflow;
+    const originalPaddingRight = document.body.style.paddingRight;
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    if (scrollbarWidth > 0) {
+      document.body.style.paddingRight = `${scrollbarWidth}px`;
     }
-  }, [isFullScreen]);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      document.body.style.paddingRight = originalPaddingRight;
+    };
+  }, []);
 
-  const handleContainerScroll = () => {
-    const el = scrollContainerRef.current;
-    if (!el) return;
-    const distanceToBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
-    const nearBottom = distanceToBottom < 80;
-    isNearBottomRef.current = nearBottom;
-    setShowScrollBottomBtn(!nearBottom);
-  };
+  const handleContainerScroll = useCallback(() => {
+    if (!tickingRef.current) {
+      window.requestAnimationFrame(() => {
+        const el = scrollContainerRef.current;
+        if (el) {
+          const distanceToBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+          const nearBottom = distanceToBottom < 80;
+          isNearBottomRef.current = nearBottom;
+          setShowScrollBottomBtn((prev) => (prev !== !nearBottom ? !nearBottom : prev));
+        }
+        tickingRef.current = false;
+      });
+      tickingRef.current = true;
+    }
+  }, []);
 
   const scrollToBottom = useCallback((force = false) => {
+    const el = scrollContainerRef.current;
+    if (!el) return;
     if (force || isNearBottomRef.current) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      el.scrollTo({
+        top: el.scrollHeight,
+        behavior: 'smooth'
+      });
     }
   }, []);
 
@@ -482,7 +499,6 @@ export default function ChatWindow({ onClose }) {
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.94, y: 20 }}
       transition={{ type: 'spring', stiffness: 320, damping: 26 }}
-      onWheel={(e) => e.stopPropagation()}
       className={`fixed z-50 rounded-2xl flex flex-col overflow-hidden text-white font-sans border border-cyan-400/25 shadow-[0_20px_60px_rgba(0,0,0,0.85),0_0_35px_rgba(0,244,255,0.15)] backdrop-blur-2xl transition-all duration-300 overscroll-contain ${
         isFullScreen
           ? 'inset-2 sm:inset-4 w-[calc(100vw-16px)] sm:w-[calc(100vw-32px)] h-[calc(100vh-16px)] sm:h-[calc(100vh-32px)]'
@@ -535,7 +551,7 @@ export default function ChatWindow({ onClose }) {
       <div
         ref={scrollContainerRef}
         onScroll={handleContainerScroll}
-        className="flex-1 overflow-y-auto p-4 space-y-4 overscroll-contain relative"
+        className="flex-1 overflow-y-auto p-4 space-y-4 chat-scroll relative"
       >
         {messages.map((msg) => (
           <div
@@ -546,7 +562,7 @@ export default function ChatWindow({ onClose }) {
               className={`max-w-[88%] rounded-2xl px-4 py-3 text-[13.5px] leading-relaxed shadow-sm ${
                 msg.role === 'user'
                   ? 'bg-gradient-to-r from-cyan-600 to-teal-500 text-white font-medium rounded-br-none shadow-[0_4px_15px_rgba(0,244,255,0.2)]'
-                  : 'bg-slate-900/80 text-gray-100 rounded-bl-none border border-white/10 backdrop-blur-md font-normal'
+                  : 'bg-slate-900/90 text-gray-100 rounded-bl-none border border-white/10 font-normal'
               }`}
             >
               <div className="prose prose-invert prose-sm max-w-none text-gray-100 [&>p]:mb-2 [&>ul]:list-disc [&>ul]:pl-4 [&>ol]:list-decimal [&>ol]:pl-4 [&>strong]:text-white [&>strong]:font-semibold">

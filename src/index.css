@@ -11,10 +11,8 @@ h2 {
 }
 
 @layer utilities {
-    @layer utilities {
-        .gradient {
-            background: linear-gradient(to bottom, #8a8989,#1b1f3b, #000 );
-        }
+    .gradient {
+        background: linear-gradient(to bottom, #000000, #060814, #0a0d1a, #000000);
     }
 }
 
@@ -46,4 +44,34 @@ h2 {
 
 .animate-jump {
   animation: jump-spring 2s ease-in-out infinite;
+}
+
+/* Custom sleek scrollbar & hardware-accelerated scroll for Chat Window */
+.chat-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 244, 255, 0.3) transparent;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  will-change: scroll-position;
+  transform: translateZ(0);
+}
+
+.chat-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-scroll::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 9999px;
+}
+
+.chat-scroll::-webkit-scrollbar-thumb {
+  background: rgba(0, 244, 255, 0.25);
+  border-radius: 9999px;
+  border: 1px solid rgba(0, 244, 255, 0.15);
+}
+
+.chat-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 244, 255, 0.5);
 }
