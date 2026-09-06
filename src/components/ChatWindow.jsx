@@ -2,7 +2,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
   IoClose, IoSend, IoSparkles, IoTerminalOutline, 
-  IoExpandOutline, IoContractOutline, IoCheckmarkCircle, IoMailOutline 
+  IoExpandOutline, IoContractOutline, IoCheckmarkCircle, IoMailOutline,
+  IoArrowDown
 } from "react-icons/io5";
 import { RiRobot2Line, RiCompass3Line, RiMagicLine, RiCodeSSlashLine } from "react-icons/ri";
 import { FaGithub, FaExternalLinkAlt, FaStar, FaPaperPlane } from "react-icons/fa";
@@ -330,6 +331,15 @@ function SkillTags({ skills = [], onSkillClick }) {
   );
 }
 
+function sanitizeMessageContent(content) {
+  if (!content) return "";
+  return content
+    .replace(/<projects>[\s\S]*?(?:<\/projects>|$)/gi, "")
+    .replace(/<skills>[\s\S]*?(?:<\/skills>|$)/gi, "")
+    .replace(/<suggestions>[\s\S]*?(?:<\/suggestions>|$)/gi, "")
+    .trim();
+}
+
 // ── Main ChatWindow Component ───────────────────────────────────
 export default function ChatWindow({ onClose }) {
   // Starts in Half-Screen mode by default, toggleable to Full-Screen
@@ -345,17 +355,43 @@ export default function ChatWindow({ onClose }) {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [activeThought, setActiveThought] = useState('');
+  const [showScrollBottomBtn, setShowScrollBottomBtn] = useState(false);
 
   const messagesEndRef = useRef(null);
+  const scrollContainerRef = useRef(null);
   const inputRef = useRef(null);
+  const isNearBottomRef = useRef(true);
 
-  const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  // Lock background body scroll when in full-screen
+  useEffect(() => {
+    if (isFullScreen) {
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
+    }
+  }, [isFullScreen]);
+
+  const handleContainerScroll = () => {
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    const distanceToBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+    const nearBottom = distanceToBottom < 80;
+    isNearBottomRef.current = nearBottom;
+    setShowScrollBottomBtn(!nearBottom);
+  };
+
+  const scrollToBottom = useCallback((force = false) => {
+    if (force || isNearBottomRef.current) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
   }, []);
 
+  // Only auto-scroll when a new message is added or loading finishes, NEVER on activeThought interval!
   useEffect(() => {
     scrollToBottom();
-  }, [messages, loading, activeThought, scrollToBottom]);
+  }, [messages, loading, scrollToBottom]);
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -370,6 +406,9 @@ export default function ChatWindow({ onClose }) {
     setMessages((prev) => [...prev, userMsg]);
     setLoading(true);
     setActiveThought('exploring context for you...');
+
+    // Force scroll down so user immediately sees their question
+    setTimeout(() => scrollToBottom(true), 50);
 
     // Subtle dynamic thinking phase
     const thoughts = [
@@ -443,7 +482,8 @@ export default function ChatWindow({ onClose }) {
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.94, y: 20 }}
       transition={{ type: 'spring', stiffness: 320, damping: 26 }}
-      className={`fixed z-50 rounded-2xl flex flex-col overflow-hidden text-white font-sans border border-cyan-400/25 shadow-[0_20px_60px_rgba(0,0,0,0.85),0_0_35px_rgba(0,244,255,0.15)] backdrop-blur-2xl transition-all duration-300 ${
+      onWheel={(e) => e.stopPropagation()}
+      className={`fixed z-50 rounded-2xl flex flex-col overflow-hidden text-white font-sans border border-cyan-400/25 shadow-[0_20px_60px_rgba(0,0,0,0.85),0_0_35px_rgba(0,244,255,0.15)] backdrop-blur-2xl transition-all duration-300 overscroll-contain ${
         isFullScreen
           ? 'inset-2 sm:inset-4 w-[calc(100vw-16px)] sm:w-[calc(100vw-32px)] h-[calc(100vh-16px)] sm:h-[calc(100vh-32px)]'
           : 'bottom-4 right-4 sm:bottom-6 sm:right-6 w-[94vw] md:w-[50vw] lg:w-[48vw] h-[88vh] max-h-[90vh]'
@@ -492,7 +532,11 @@ export default function ChatWindow({ onClose }) {
       </div>
 
       {/* ── Message Stream Container ──────────────────────────────── */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 scroll-smooth">
+      <div
+        ref={scrollContainerRef}
+        onScroll={handleContainerScroll}
+        className="flex-1 overflow-y-auto p-4 space-y-4 overscroll-contain relative"
+      >
         {messages.map((msg) => (
           <div
             key={msg.id}
@@ -506,7 +550,7 @@ export default function ChatWindow({ onClose }) {
               }`}
             >
               <div className="prose prose-invert prose-sm max-w-none text-gray-100 [&>p]:mb-2 [&>ul]:list-disc [&>ul]:pl-4 [&>ol]:list-decimal [&>ol]:pl-4 [&>strong]:text-white [&>strong]:font-semibold">
-                <ReactMarkdown>{msg.content}</ReactMarkdown>
+                <ReactMarkdown>{sanitizeMessageContent(msg.content)}</ReactMarkdown>
               </div>
 
               {/* Scenario 1: Render Interactive Contact & AI Writing Studio Card */}
@@ -555,6 +599,23 @@ export default function ChatWindow({ onClose }) {
 
         <div ref={messagesEndRef} />
       </div>
+
+      {/* Floating Scroll to Bottom Button */}
+      <AnimatePresence>
+        {showScrollBottomBtn && (
+          <motion.button
+            initial={{ opacity: 0, y: 10, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 10, scale: 0.9 }}
+            onClick={() => scrollToBottom(true)}
+            className="absolute bottom-16 right-6 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-900/90 border border-cyan-400/40 text-cyan-300 text-xs font-mono shadow-lg hover:bg-cyan-950 hover:text-white backdrop-blur-md transition-all cursor-pointer"
+            aria-label="Scroll to bottom"
+          >
+            <IoArrowDown className="text-sm" />
+            <span>Latest</span>
+          </motion.button>
+        )}
+      </AnimatePresence>
 
       {/* ── Input Box & Send Button ───────────────────────────────── */}
       <form
