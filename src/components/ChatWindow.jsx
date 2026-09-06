@@ -1,143 +1,114 @@
 // ChatWindow.jsx
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { IoClose, IoSend, IoSparkles } from "react-icons/io5";
-import { RiRobot2Line } from "react-icons/ri";
+import { IoClose, IoSend, IoSparkles, IoTerminalOutline } from "react-icons/io5";
+import { RiRobot2Line, RiCompass3Line } from "react-icons/ri";
+import { FaGithub, FaExternalLinkAlt, FaStar } from "react-icons/fa";
 import { AnimatePresence, motion } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 
-// ── Brand tokens ────────────────────────────────────────────────
-const CYAN   = '#00BFA6';
-const GOLD   = '#F5A623';
-const BG     = '#080D0B';
-const CARD   = '#0F1714';
-const BORDER = '#1A2E28';
+// ── Brand & Liquid Glass Tokens ─────────────────────────────────
+const CYAN   = '#00f4ff';
+const GOLD   = '#ffc922';
+const BG_GLASS = 'rgba(8, 12, 22, 0.82)';
+const CARD_GLASS = 'rgba(15, 23, 42, 0.65)';
+const BORDER_SUBTLE = 'rgba(255, 255, 255, 0.08)';
+const BORDER_CYAN = 'rgba(0, 244, 255, 0.22)';
 
-// ── Email flow step → progress (0‒100) ─────────────────────────
-const EMAIL_PROGRESS = {
-  collecting_name:    20,
-  collecting_email:   40,
-  collecting_message: 60,
-  choosing_tone:      75,
-  reviewing_draft:    90,
-  done:              100,
-};
-
-// ── Suggestion pool (base) ──────────────────────────────────────
-const BASE_SUGGESTIONS = [
-  "🛠️ What projects has Akarsh built?",
-  "💼 Tell me about his experience",
-  "⚡ What's his tech stack?",
-  "🎓 What's his educational background?",
-  "🎉 Any fun facts about Akarsh?",
-  "📧 Send Akarsh a message",
-  "🌟 What makes Akarsh stand out?",
-  "🚀 What's he currently working on?",
-  "🤝 Is Akarsh open to opportunities?",
-  "🧠 What are his strongest skills?",
+// ── Default Base Suggestions ────────────────────────────────────
+const DEFAULT_SUGGESTIONS = [
+  "What are Akarsh's top AI projects?",
+  "Tell me about his work experience",
+  "What is his core tech stack?",
+  "How can I reach out or collaborate?",
 ];
 
-function pickSuggestions(used) {
-  const pool = BASE_SUGGESTIONS.filter(s => !used.has(s));
-  const shuffled = [...pool].sort(() => Math.random() - 0.5);
-  return shuffled.slice(0, 4);
-}
-
-// ── Typing indicator ────────────────────────────────────────────
-function TypingDots() {
+// ── Liquid Glass Typing Indicator & Dynamic Thoughts ─────────────
+function ThinkingPulse({ activeThought }) {
   return (
-    <div style={{ display:'flex', gap:5, padding:'10px 4px', alignItems:'center' }}>
-      {[0,1,2].map(i => (
-        <motion.span
-          key={i}
-          style={{ width:7, height:7, borderRadius:'50%', background: CYAN, display:'block' }}
-          animate={{ y: [0, -6, 0] }}
-          transition={{ duration: 0.7, repeat: Infinity, delay: i * 0.15 }}
-        />
-      ))}
-    </div>
-  );
-}
-
-// ── Email progress bar ──────────────────────────────────────────
-function EmailProgress({ step }) {
-  const pct = EMAIL_PROGRESS[step] ?? 0;
-  if (!pct) return null;
-  return (
-    <div style={{ padding:'6px 16px 0', flexShrink:0 }}>
-      <div style={{ display:'flex', justifyContent:'space-between', marginBottom:4 }}>
-        <span style={{ fontSize:11, color: CYAN, letterSpacing:1, textTransform:'uppercase', fontFamily:'monospace' }}>
-          ✉ Email flow
+    <motion.div
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -6 }}
+      className="flex flex-col gap-2 py-2 px-3 rounded-xl bg-cyan-950/20 border border-cyan-500/20"
+    >
+      <div className="flex items-center gap-2">
+        <div className="relative flex h-2.5 w-2.5">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00f4ff] opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#00f4ff]"></span>
+        </div>
+        <span className="text-xs font-mono text-cyan-300/90 tracking-wide lowercase">
+          {activeThought || "thinking and exploring facts..."}
         </span>
-        <span style={{ fontSize:11, color: GOLD, fontFamily:'monospace' }}>{pct}%</span>
       </div>
-      <div style={{ height:3, background: BORDER, borderRadius:2, overflow:'hidden' }}>
-        <motion.div
-          style={{ height:'100%', background:`linear-gradient(90deg,${CYAN},${GOLD})`, borderRadius:2 }}
-          initial={{ width:0 }}
-          animate={{ width:`${pct}%` }}
-          transition={{ duration:0.5 }}
-        />
-      </div>
-    </div>
+    </motion.div>
   );
 }
 
-// ── Project card renderer ───────────────────────────────────────
+// ── Interactive Glass Project Bento Card ────────────────────────
 function ProjectCard({ name, tech = [], description, link, homepage, stars, updatedAt }) {
   return (
     <motion.div
-      initial={{ opacity:0, y:8 }}
-      animate={{ opacity:1, y:0 }}
-      style={{
-        background: CARD,
-        border:`1px solid ${BORDER}`,
-        borderLeft:`3px solid ${CYAN}`,
-        borderRadius:10,
-        padding:'12px 14px',
-        marginTop:8,
-        width:'100%',
-      }}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -2, borderColor: 'rgba(0, 244, 255, 0.4)' }}
+      transition={{ duration: 0.2 }}
+      className="mt-3 p-3.5 rounded-xl border border-white/10 bg-slate-900/60 backdrop-blur-md transition-all shadow-lg hover:shadow-[0_0_20px_rgba(0,244,255,0.12)] text-left"
     >
-      {/* Header row */}
-      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:4 }}>
-        <div style={{ fontWeight:700, color:'#fff', fontSize:14 }}>{name}</div>
+      <div className="flex justify-between items-start gap-2 mb-1.5">
+        <div className="font-semibold text-white text-sm tracking-wide flex items-center gap-1.5">
+          <IoTerminalOutline className="text-[#00f4ff] text-base" />
+          {name}
+        </div>
         {stars > 0 && (
-          <span style={{ fontSize:11, color: GOLD, fontFamily:'monospace', whiteSpace:'nowrap', marginLeft:8 }}>
-            ⭐ {stars}
+          <span className="flex items-center gap-1 text-[11px] text-[#ffc922] font-mono bg-amber-400/10 px-2 py-0.5 rounded-full border border-amber-400/20">
+            <FaStar className="text-[10px]" /> {stars}
           </span>
         )}
       </div>
 
-      {description && <div style={{ fontSize:12, color:'#9CACA8', marginBottom:8, lineHeight:1.5 }}>{description}</div>}
+      {description && (
+        <p className="text-xs text-gray-300 leading-relaxed mb-2.5 font-normal">
+          {description}
+        </p>
+      )}
 
-      {/* Tech tags */}
-      <div style={{ display:'flex', flexWrap:'wrap', gap:5, marginBottom:8 }}>
-        {tech.map(t => (
-          <span key={t} style={{
-            fontSize:10, padding:'2px 8px', borderRadius:20,
-            background:'rgba(0,191,166,0.12)', color: CYAN,
-            border:`1px solid rgba(0,191,166,0.25)`, fontFamily:'monospace',
-          }}>{t}</span>
-        ))}
-      </div>
+      {tech.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 mb-3">
+          {tech.map((t, idx) => (
+            <span
+              key={idx}
+              className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-[#00f4ff]/10 text-[#00f4ff] border border-[#00f4ff]/20"
+            >
+              {t}
+            </span>
+          ))}
+        </div>
+      )}
 
-      {/* Footer row — links + updated */}
-      <div style={{ display:'flex', alignItems:'center', gap:12, flexWrap:'wrap' }}>
+      <div className="flex items-center gap-3 text-xs pt-1 border-t border-white/5">
         {link && (
-          <a href={link} target="_blank" rel="noreferrer"
-            style={{ fontSize:11, color: GOLD, textDecoration:'none' }}>
-            GitHub →
+          <a
+            href={link}
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center gap-1 text-[#ffc922] hover:text-white transition-colors font-medium"
+          >
+            <FaGithub /> GitHub →
           </a>
         )}
         {homepage && (
-          <a href={homepage} target="_blank" rel="noreferrer"
-            style={{ fontSize:11, color: CYAN, textDecoration:'none' }}>
-            Live demo →
+          <a
+            href={homepage}
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center gap-1 text-[#00f4ff] hover:text-white transition-colors font-medium"
+          >
+            <FaExternalLinkAlt className="text-[10px]" /> Live Demo →
           </a>
         )}
         {updatedAt && (
-          <span style={{ fontSize:10, color:'#5A7A74', marginLeft:'auto' }}>
-            Updated {updatedAt}
+          <span className="text-[10px] text-gray-400 ml-auto font-mono">
+            {updatedAt}
           </span>
         )}
       </div>
@@ -145,352 +116,249 @@ function ProjectCard({ name, tech = [], description, link, homepage, stars, upda
   );
 }
 
-// ── Skill tags renderer ─────────────────────────────────────────
+// ── Skill Badges Component ──────────────────────────────────────
 function SkillTags({ skills = [] }) {
+  if (!skills || !skills.length) return null;
   return (
-    <div style={{ display:'flex', flexWrap:'wrap', gap:6, marginTop:8 }}>
-      {skills.map(s => (
-        <span key={s} style={{
-          fontSize:11, padding:'4px 10px', borderRadius:20,
-          background:'rgba(245,166,35,0.12)', color: GOLD,
-          border:`1px solid rgba(245,166,35,0.25)`, fontFamily:'monospace',
-        }}>{s}</span>
+    <div className="flex flex-wrap gap-1.5 mt-2.5">
+      {skills.map((s, idx) => (
+        <span
+          key={idx}
+          className="text-xs font-mono px-2.5 py-1 rounded-full bg-amber-500/10 text-[#ffc922] border border-amber-500/25"
+        >
+          {s}
+        </span>
       ))}
     </div>
   );
 }
 
-// ── Markdown components ─────────────────────────────────────────
-const mdComponents = {
-  p:      ({ ...p }) => <p style={{ margin:'0 0 6px', lineHeight:1.6, fontSize:13 }} {...p} />,
-  ul:     ({ ...p }) => <ul style={{ paddingLeft:18, margin:'4px 0' }} {...p} />,
-  li:     ({ ...p }) => <li style={{ marginBottom:3, fontSize:13 }} {...p} />,
-  strong: ({ ...p }) => <strong style={{ color:'#fff', fontWeight:700 }} {...p} />,
-  a:      ({ href, children }) => (
-    <a href={href} target="_blank" rel="noreferrer"
-      style={{ color: CYAN, textDecoration:'underline' }}>{children}</a>
-  ),
-  code: ({ className, children, ...p }) => {
-    const isBlock = className?.includes('language-');
-    return isBlock
-      ? <pre style={{ background:'#0A1510', padding:10, borderRadius:8, overflowX:'auto', fontSize:12, fontFamily:'monospace', margin:'6px 0' }}>
-          <code className={className} {...p}>{children}</code>
-        </pre>
-      : <code style={{ background:'rgba(0,191,166,0.12)', padding:'1px 5px', borderRadius:4, fontSize:12, fontFamily:'monospace' }} {...p}>{children}</code>;
-  },
-};
-
-// ── Main component ──────────────────────────────────────────────
+// ── Main ChatWindow Component ───────────────────────────────────
 export default function ChatWindow({ onClose }) {
-  const [input, setInput]       = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [messages, setMessages] = useState([{
-    id: crypto.randomUUID(), sender:'bot', text:
-      "Hey! 👋 I'm Akarsh's AI assistant — ask me anything about him, his projects, or his experience.\n\nOr I can help you send him a message directly! 🚀",
-    suggestions: pickSuggestions(new Set()),
-  }]);
-  const [chatHistory, setChatHistory]   = useState([]);
-  const [usedSuggestions] = useState(() => new Set());
-  const userProfileRef = useRef(null);  // tracks visitor profile silently
+  const [messages, setMessages] = useState([
+    {
+      id: 'welcome',
+      role: 'assistant',
+      content: "Hey! I'm Akarsh's AI assistant. Ask me anything about his projects, experience, tech stack, or get in touch!",
+      suggestions: DEFAULT_SUGGESTIONS,
+    },
+  ]);
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [activeThought, setActiveThought] = useState('');
+  const [emailState, setEmailState] = useState(null);
+  const [userProfile, setUserProfile] = useState({});
 
-  const emailStateRef  = useRef(null);
   const messagesEndRef = useRef(null);
-  const textareaRef    = useRef(null);
+  const inputRef = useRef(null);
 
-  // auto-focus
-  useEffect(() => { textareaRef.current?.focus(); }, []);
-
-  // auto-scroll
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior:'smooth' });
-  }, [messages]);
-
-  // auto-grow textarea
-  useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = textareaRef.current.scrollHeight + 'px';
-    }
-  }, [input]);
-
-  // warmup on mount
-  useEffect(() => {
-    fetch('https://aj-backend.vercel.app/api/ask-gemini', {
-      method:'POST',
-      headers:{ 'Content-Type':'application/json' },
-      body: JSON.stringify({ query:'__warmup__', history:[] }),
-    }).catch(() => {});
+  const scrollToBottom = useCallback(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, []);
 
-  const fetchWithTimeout = useCallback((url, options = {}, timeout = 28000) =>
-    Promise.race([
-      fetch(url, options),
-      new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), timeout)),
-    ]), []);
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, loading, activeThought, scrollToBottom]);
 
-  const replaceMessage = (id, patch) =>
-    setMessages(prev => prev.map(m => m.id === id ? { ...m, ...patch } : m));
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
 
-  const submit = useCallback(async (text) => {
-    const q = text.trim();
-    if (!q || isLoading) return;
+  const handleSend = async (textToSend) => {
+    const query = (textToSend || input).trim();
+    if (!query || loading) return;
 
-    setIsLoading(true);
-    const thinkingId = crypto.randomUUID();
-
-    setMessages(prev => [
-      ...prev,
-      { id: crypto.randomUUID(), sender:'user', text: q },
-      { id: thinkingId, sender:'bot', text:'__thinking__' },
-    ]);
     setInput('');
-    setTimeout(() => textareaRef.current?.focus(), 0);
+    const userMsg = { id: Date.now().toString(), role: 'user', content: query };
+    setMessages((prev) => [...prev, userMsg]);
+    setLoading(true);
+    setActiveThought('exploring context for you...');
+
+    // Subtle dynamic thinking phase
+    const thoughts = [
+      'analyzing your question...',
+      'checking portfolio knowledge...',
+      'synthesizing answer with verified facts...',
+    ];
+    let thoughtIdx = 0;
+    const interval = setInterval(() => {
+      thoughtIdx = (thoughtIdx + 1) % thoughts.length;
+      setActiveThought(thoughts[thoughtIdx]);
+    }, 1200);
 
     try {
-      const res = await fetchWithTimeout('https://aj-backend.vercel.app/api/ask-gemini', {
-        method:'POST',
-        headers:{ 'Content-Type':'application/json' },
+      const historyPayload = messages
+        .filter((m) => m.role === 'user' || m.role === 'assistant')
+        .slice(-6)
+        .map((m) => ({ role: m.role, content: m.content }));
+
+      const res = await fetch('https://aj-backend.vercel.app/api/ask-gemini', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          query: q,
-          history: chatHistory.slice(-20),
-          emailState: emailStateRef.current,
-          userProfile: userProfileRef.current,
+          query,
+          history: historyPayload,
+          emailState,
+          userProfile,
         }),
       });
 
-      if (!res.ok) throw new Error('Network error');
+      clearInterval(interval);
+
+      if (!res.ok) {
+        throw new Error(`Server returned ${res.status}`);
+      }
+
       const data = await res.json();
+      setEmailState(data.emailState || null);
+      if (data.userProfile) setUserProfile(data.userProfile);
 
-      emailStateRef.current  = data.emailState  || null;
-      userProfileRef.current  = data.userProfile || null;
-      setChatHistory(data.history || []);
+      const botMsg = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: data.answer || "I'm here to help with any details regarding Akarsh!",
+        cards: data.cards || [],
+        skills: data.skills || [],
+        suggestions: data.suggestions && data.suggestions.length ? data.suggestions : DEFAULT_SUGGESTIONS,
+      };
 
-      // pick fresh suggestions (not used before, not same as current)
-      const newSugs = pickSuggestions(usedSuggestions);
-      newSugs.forEach(s => usedSuggestions.add(s));
-
-      replaceMessage(thinkingId, {
-        text: data.answer,
-        cards:    data.cards    || [],
-        skills:   data.skills   || [],
-        suggestions: data.emailState ? [] : newSugs,
-        emailStep: data.emailState?.step || null,
-      });
-
+      setMessages((prev) => [...prev, botMsg]);
     } catch (err) {
-      replaceMessage(thinkingId, {
-        text: err.message === 'timeout'
-          ? "⏱️ Taking longer than usual — please try again!"
-          : "⚠️ Something went wrong. Please try again!",
-      });
+      clearInterval(interval);
+      console.error('Chat error:', err);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: "Sorry, I had a quick hiccup reaching the backend. Please feel free to ask again or check Akarsh's GitHub/LinkedIn directly!",
+          suggestions: DEFAULT_SUGGESTIONS,
+        },
+      ]);
     } finally {
-      setIsLoading(false);
-      setTimeout(() => textareaRef.current?.focus(), 100);
+      setLoading(false);
+      setActiveThought('');
     }
-  }, [isLoading, chatHistory, fetchWithTimeout, usedSuggestions]);
-
-  const handleSubmit = (e) => { e?.preventDefault(); submit(input); };
-
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submit(input); }
   };
 
-  const handleSuggestion = (s) => { submit(s); };
-
-  const emailStep = emailStateRef.current?.step || null;
-
   return (
-    <div style={{
-      position:'fixed', zIndex:50,
-      bottom:0, right:0,
-      width:'100%', height:'90%',
-      display:'flex', flexDirection:'column',
-      background: BG,
-      color:'#E0F0ED',
-      borderTop:`1px solid ${BORDER}`,
-      fontFamily:"'DM Sans', 'Segoe UI', sans-serif",
-      overflow:'hidden',
-    }}
-    className="sm:w-[90%] md:w-[75%] lg:w-[48%] sm:bottom-6 sm:right-6 sm:h-[88%] sm:rounded-xl sm:border"
+    <motion.div
+      initial={{ opacity: 0, scale: 0.92, y: 20 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.92, y: 20 }}
+      transition={{ type: 'spring', stiffness: 320, damping: 24 }}
+      className="fixed bottom-6 right-6 z-50 w-[92vw] sm:w-[420px] h-[580px] max-h-[85vh] rounded-2xl flex flex-col overflow-hidden text-white font-sans border border-cyan-400/25 shadow-[0_20px_60px_rgba(0,0,0,0.8),0_0_35px_rgba(0,244,255,0.15)] backdrop-blur-2xl"
+      style={{ background: BG_GLASS }}
     >
-
-      {/* ── Header ── */}
-      <div style={{
-        display:'flex', alignItems:'center', gap:10,
-        padding:'12px 16px',
-        borderBottom:`1px solid ${BORDER}`,
-        background:`linear-gradient(135deg, #0C1712 0%, #080D0B 100%)`,
-        flexShrink:0,
-      }}>
-        <div style={{
-          width:36, height:36, borderRadius:'50%',
-          background:`linear-gradient(135deg,${CYAN},${GOLD})`,
-          display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0,
-        }}>
-          <RiRobot2Line size={20} color="#000" />
-        </div>
-        <div style={{ flex:1 }}>
-          <div style={{ fontWeight:700, fontSize:14, color:'#fff', letterSpacing:0.3 }}>Akarsh's AI</div>
-          <div style={{ fontSize:11, color: CYAN, display:'flex', alignItems:'center', gap:4 }}>
-            <span style={{ width:6, height:6, borderRadius:'50%', background: CYAN, display:'inline-block',
-              boxShadow:`0 0 6px ${CYAN}` }} />
-            Online · Ask me anything
+      {/* ── Top Bar / Header ──────────────────────────────────────── */}
+      <div className="flex items-center justify-between px-4 py-3.5 border-b border-white/10 bg-slate-950/60 backdrop-blur-md">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#00f4ff]/20 to-[#ffc922]/20 border border-[#00f4ff]/40 flex items-center justify-center text-[#00f4ff]">
+            <RiRobot2Line className="text-lg" />
+          </div>
+          <div>
+            <div className="flex items-center gap-1.5">
+              <span className="font-bold text-sm tracking-wide text-white">Akarsh AI</span>
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            </div>
+            <p className="text-[11px] text-cyan-200/60 font-mono">portfolio intelligence</p>
           </div>
         </div>
-        <button onClick={onClose} aria-label="Close chat" style={{
-          background:'transparent', border:'none', cursor:'pointer',
-          color:'#5A7A74', padding:4, borderRadius:'50%',
-          display:'flex', alignItems:'center', justifyContent:'center',
-          transition:'color 0.2s',
-        }}
-        onMouseEnter={e => e.currentTarget.style.color='#fff'}
-        onMouseLeave={e => e.currentTarget.style.color='#5A7A74'}
+
+        <button
+          onClick={onClose}
+          className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
+          aria-label="Close chat"
         >
-          <IoClose size={22} />
+          <IoClose className="text-xl" />
         </button>
       </div>
 
-      {/* ── Email progress ── */}
-      {emailStep && <EmailProgress step={emailStep} />}
-
-      {/* ── Messages ── */}
-      <div style={{ flex:1, overflowY:'auto', padding:'16px 14px', display:'flex', flexDirection:'column', gap:14 }}>
-        <AnimatePresence initial={false}>
-          {messages.map((msg) => (
-            <motion.div key={msg.id}
-              initial={{ opacity:0, y:10 }}
-              animate={{ opacity:1, y:0 }}
-              transition={{ duration:0.25 }}
-              style={{ display:'flex', flexDirection:'column',
-                alignItems: msg.sender === 'user' ? 'flex-end' : 'flex-start',
-              }}
+      {/* ── Message Stream Container ──────────────────────────────── */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 scroll-smooth">
+        {messages.map((msg) => (
+          <div
+            key={msg.id}
+            className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}
+          >
+            <div
+              className={`max-w-[88%] rounded-2xl px-4 py-3 text-[13.5px] leading-relaxed shadow-sm ${
+                msg.role === 'user'
+                  ? 'bg-gradient-to-r from-cyan-600 to-teal-500 text-white font-medium rounded-br-none shadow-[0_4px_15px_rgba(0,244,255,0.2)]'
+                  : 'bg-slate-900/80 text-gray-100 rounded-bl-none border border-white/10 backdrop-blur-md font-normal'
+              }`}
             >
-              {/* bubble row */}
-              <div style={{ display:'flex', alignItems:'flex-end', gap:8,
-                flexDirection: msg.sender === 'user' ? 'row-reverse' : 'row',
-                maxWidth:'85%',
-              }}>
-                {/* avatar */}
-                {msg.sender === 'bot' && (
-                  <div style={{
-                    width:28, height:28, borderRadius:'50%', flexShrink:0,
-                    background:`linear-gradient(135deg,${CYAN},${GOLD})`,
-                    display:'flex', alignItems:'center', justifyContent:'center',
-                  }}>
-                    <RiRobot2Line size={15} color="#000" />
-                  </div>
-                )}
-
-                {/* bubble */}
-                <div style={{
-                  padding:'10px 14px',
-                  borderRadius: msg.sender === 'user' ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
-                  background: msg.sender === 'user'
-                    ? `linear-gradient(135deg,${CYAN}CC,${CYAN}99)`
-                    : CARD,
-                  border: msg.sender === 'user' ? 'none' : `1px solid ${BORDER}`,
-                  color: msg.sender === 'user' ? '#000' : '#D8EDEA',
-                  fontSize:13, lineHeight:1.6,
-                  maxWidth:'100%',
-                }}>
-                  {msg.text === '__thinking__'
-                    ? <TypingDots />
-                    : <ReactMarkdown components={mdComponents}>
-                        {msg.text}
-                      </ReactMarkdown>
-                  }
-                </div>
+              <div className="prose prose-invert prose-sm max-w-none text-gray-100 [&>p]:mb-2 [&>ul]:list-disc [&>ul]:pl-4 [&>ol]:list-decimal [&>ol]:pl-4 [&>strong]:text-white [&>strong]:font-semibold">
+                <ReactMarkdown>{msg.content}</ReactMarkdown>
               </div>
 
-              {/* rich cards */}
-              {msg.cards?.length > 0 && (
-                <div style={{ maxWidth:'85%', marginLeft:36, width:'100%' }}>
-                  {msg.cards.map((c, i) => <ProjectCard key={i} {...c} />)}
-                </div>
-              )}
-
-              {/* skill tags */}
-              {msg.skills?.length > 0 && (
-                <div style={{ maxWidth:'85%', marginLeft:36 }}>
-                  <SkillTags skills={msg.skills} />
-                </div>
-              )}
-
-              {/* suggestion chips */}
-              {msg.suggestions?.length > 0 && (
-                <div style={{
-                  display:'flex', flexWrap:'wrap', gap:6,
-                  marginTop:8, marginLeft:36, maxWidth:'90%',
-                }}>
-                  {msg.suggestions.map(s => (
-                    <button key={s} onClick={() => handleSuggestion(s)}
-                      disabled={isLoading}
-                      style={{
-                        fontSize:11, padding:'5px 11px', borderRadius:20, cursor:'pointer',
-                        background:'rgba(0,191,166,0.08)',
-                        border:`1px solid rgba(0,191,166,0.3)`,
-                        color: CYAN, transition:'all 0.2s',
-                        fontFamily:'inherit',
-                      }}
-                      onMouseEnter={e => { e.currentTarget.style.background=`rgba(0,191,166,0.2)`; }}
-                      onMouseLeave={e => { e.currentTarget.style.background=`rgba(0,191,166,0.08)`; }}
-                    >{s}</button>
+              {/* Render Project Cards if any */}
+              {msg.cards && msg.cards.length > 0 && (
+                <div className="mt-2 space-y-2">
+                  {msg.cards.map((card, cIdx) => (
+                    <ProjectCard key={cIdx} {...card} />
                   ))}
                 </div>
               )}
-            </motion.div>
-          ))}
-        </AnimatePresence>
+
+              {/* Render Skills Tags if any */}
+              {msg.skills && msg.skills.length > 0 && (
+                <SkillTags skills={msg.skills} />
+              )}
+            </div>
+
+            {/* Render Contextual Follow-Up Suggestions below latest assistant message */}
+            {msg.role === 'assistant' && msg.suggestions && msg.suggestions.length > 0 && (
+              <div className="mt-2.5 flex flex-wrap gap-1.5 pl-1 max-w-[95%]">
+                {msg.suggestions.slice(0, 3).map((sug, sIdx) => (
+                  <button
+                    key={sIdx}
+                    onClick={() => handleSend(sug)}
+                    className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-white/5 hover:bg-[#00f4ff]/15 text-cyan-200/80 hover:text-[#00f4ff] border border-white/10 hover:border-[#00f4ff]/40 transition-all text-left flex items-center gap-1 active:scale-95"
+                  >
+                    <RiCompass3Line className="text-xs text-[#ffc922]" />
+                    {sug}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+
+        {loading && (
+          <div className="flex flex-col items-start">
+            <ThinkingPulse activeThought={activeThought} />
+          </div>
+        )}
+
         <div ref={messagesEndRef} />
       </div>
 
-      {/* ── Input ── */}
-      <form onSubmit={handleSubmit} style={{
-        padding:'10px 14px 14px',
-        borderTop:`1px solid ${BORDER}`,
-        display:'flex', gap:8, alignItems:'flex-end',
-        background: BG, flexShrink:0,
-      }}>
-        <textarea
-          ref={textareaRef}
+      {/* ── Input Box & Send Button ───────────────────────────────── */}
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSend();
+        }}
+        className="p-3 border-t border-white/10 bg-slate-950/70 backdrop-blur-md flex items-center gap-2"
+      >
+        <input
+          ref={inputRef}
+          type="text"
           value={input}
-          onChange={e => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          rows={1}
-          disabled={isLoading}
-          placeholder="Ask anything about Akarsh…"
-          style={{
-            flex:1, maxHeight:120, padding:'10px 14px',
-            background: CARD,
-            border:`1px solid ${BORDER}`,
-            borderRadius:14, color:'#E0F0ED', fontSize:13,
-            resize:'none', outline:'none', fontFamily:'inherit',
-            lineHeight:1.5, overflowY:'hidden',
-            transition:'border-color 0.2s',
-          }}
-          onFocus={e => e.currentTarget.style.borderColor = CYAN}
-          onBlur={e => e.currentTarget.style.borderColor = BORDER}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Ask about projects, skills, experience..."
+          className="flex-1 bg-slate-900/80 text-white placeholder-gray-400 text-sm px-3.5 py-2.5 rounded-xl border border-white/10 focus:outline-none focus:border-[#00f4ff] focus:ring-1 focus:ring-[#00f4ff] transition-all font-sans"
         />
-        <button type="submit" disabled={isLoading || !input.trim()}
+        <button
+          type="submit"
+          disabled={!input.trim() || loading}
+          className="w-10 h-10 rounded-xl bg-gradient-to-r from-[#00f4ff] to-[#00bf8f] text-black font-bold flex items-center justify-center hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-[0_0_15px_rgba(0,244,255,0.2)] active:scale-95 shrink-0"
           aria-label="Send message"
-          style={{
-            width:42, height:42, borderRadius:'50%', border:'none', cursor:'pointer',
-            background: (isLoading || !input.trim())
-              ? '#1A2E28'
-              : `linear-gradient(135deg,${CYAN},${GOLD})`,
-            display:'flex', alignItems:'center', justifyContent:'center',
-            flexShrink:0, transition:'all 0.2s',
-            boxShadow: (!isLoading && input.trim()) ? `0 0 12px ${CYAN}55` : 'none',
-          }}
         >
-          {isLoading
-            ? <motion.div animate={{ rotate:360 }} transition={{ duration:1, repeat:Infinity, ease:'linear' }}>
-                <IoSparkles size={18} color={CYAN} />
-              </motion.div>
-            : <IoSend size={17} color={input.trim() ? '#000' : '#3A5A54'} />
-          }
+          <IoSend className="text-sm ml-0.5" />
         </button>
       </form>
-    </div>
+    </motion.div>
   );
 }
