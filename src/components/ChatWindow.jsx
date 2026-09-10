@@ -499,7 +499,7 @@ export default function ChatWindow({ onClose }) {
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.94, y: 20 }}
       transition={{ type: 'spring', stiffness: 320, damping: 26 }}
-      className={`fixed z-50 rounded-2xl flex flex-col overflow-hidden text-white font-sans border border-cyan-400/25 shadow-[0_20px_60px_rgba(0,0,0,0.85),0_0_35px_rgba(0,244,255,0.15)] backdrop-blur-2xl transition-all duration-300 overscroll-contain ${
+      className={`fixed z-[9999] rounded-2xl flex flex-col overflow-hidden text-white font-sans border border-cyan-400/25 shadow-[0_20px_60px_rgba(0,0,0,0.85),0_0_35px_rgba(0,244,255,0.15)] backdrop-blur-2xl transition-all duration-300 overscroll-contain ${
         isFullScreen
           ? 'inset-2 sm:inset-4 w-[calc(100vw-16px)] sm:w-[calc(100vw-32px)] h-[calc(100vh-16px)] sm:h-[calc(100vh-32px)]'
           : 'bottom-4 right-4 sm:bottom-6 sm:right-6 w-[94vw] md:w-[50vw] lg:w-[48vw] h-[88vh] max-h-[90vh]'

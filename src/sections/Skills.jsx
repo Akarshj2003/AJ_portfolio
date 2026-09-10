@@ -393,7 +393,7 @@ const Skills = () => {
   return (
     <section
       id="skills"
-      className="relative min-h-screen w-full bg-[#000000] text-white py-12 sm:py-16 px-4 sm:px-6 lg:px-10 overflow-hidden"
+      className="relative min-h-screen w-full bg-[#000000] text-white py-20 lg:py-24 px-4 sm:px-6 lg:px-10 flex flex-col justify-center"
     >
       {/* Ambient Cosmic Glow Orbs */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -408,50 +408,29 @@ const Skills = () => {
         <div className="absolute inset-0 bg-[radial-gradient(#ffffff0a_1px,transparent_1px)] [background-size:24px_24px] opacity-40" />
       </div>
 
-      <div className="relative z-10 max-w-[1440px] w-full mx-auto flex flex-col gap-6">
-        {/* Section Header (Compact) */}
-        <div className="flex flex-col items-center text-center max-w-3xl mx-auto">
-          <motion.div
+      <div className="relative z-10 max-w-[1360px] w-full mx-auto flex flex-col gap-6">
+        {/* Section Header */}
+        <div className="flex flex-col items-center text-center mx-auto">
+          <motion.h2
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-cyan-400/30 bg-cyan-950/30 text-cyan-300 text-xs font-mono tracking-wider uppercase backdrop-blur-md mb-2 shadow-[0_0_15px_rgba(0,244,255,0.15)]"
-          >
-            <LuWorkflow className="w-3.5 h-3.5 text-cyan-400" />
-            Architectural Capabilities & Tooling
-          </motion.div>
-
-          <motion.h2
-            initial={{ opacity: 0, y: 15 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-            className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-[#00f4ff] to-[#ffc922]"
+            className="text-2xl sm:text-3xl lg:text-[34px] font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-[#00f4ff] to-[#ffc922]"
           >
             Engineering Stack & Systems
           </motion.h2>
-
-          <motion.p
-            initial={{ opacity: 0, y: 15 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.15 }}
-            className="mt-2 text-xs sm:text-sm md:text-base text-gray-300 max-w-2xl leading-relaxed"
-          >
-            Structured across intelligent AI models, high-performance web runtimes, distributed backends, and deployment infrastructure.
-          </motion.p>
         </div>
 
-        {/* Problem-to-Tech Resolver: Filter Bar & Slim Rationale HUD */}
+        {/* Problem-to-Tech Resolver: Filter Bar */}
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
+          initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="flex flex-col gap-3 items-center w-full"
+          className="flex flex-col gap-1.5 items-center w-full"
         >
-          {/* Interactive Filter Grid (5 clean slots matching full section width) */}
-          <div className="w-full p-1.5 rounded-2xl bg-white/[0.03] border border-white/[0.08] backdrop-blur-xl">
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1.5 sm:gap-2 w-full">
+          {/* Interactive Filter Grid */}
+          <div className="w-full p-1 rounded-xl bg-white/[0.03] border border-white/[0.08] backdrop-blur-xl">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1 w-full">
               {PROBLEM_LENSES.map((lens) => {
                 const isActive = activeLens === lens.id
                 const LensIcon = lens.icon
@@ -460,7 +439,7 @@ const Skills = () => {
                   <button
                     key={lens.id}
                     onClick={() => setActiveLens(lens.id)}
-                    className={`relative px-2.5 sm:px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 cursor-pointer flex items-center justify-center gap-2 text-center select-none ${
+                    className={`relative px-2 py-1.5 rounded-lg text-xs font-medium transition-all duration-300 cursor-pointer flex items-center justify-center gap-1.5 text-center select-none ${
                       isActive
                         ? 'text-black font-semibold shadow-[0_0_20px_#00f4ff]'
                         : 'text-gray-300 hover:text-white hover:bg-white/[0.05]'
@@ -469,12 +448,12 @@ const Skills = () => {
                     {isActive && (
                       <motion.div
                         layoutId="activeLensPill"
-                        className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#00f4ff] via-[#1cd8d2] to-[#ffc922]"
+                        className="absolute inset-0 rounded-lg bg-gradient-to-r from-[#00f4ff] via-[#1cd8d2] to-[#ffc922]"
                         transition={{ type: 'spring', stiffness: 350, damping: 25 }}
                       />
                     )}
                     <LensIcon
-                      className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 relative z-10 transition-colors ${
+                      className={`w-3.5 h-3.5 shrink-0 relative z-10 transition-colors ${
                         isActive ? 'text-black' : 'text-cyan-400'
                       }`}
                     />
@@ -485,89 +464,49 @@ const Skills = () => {
             </div>
           </div>
 
-          {/* Slim Dynamic Architectural Rationale HUD */}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeLens}
-              initial={{ opacity: 0, y: 6, scale: 0.99 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -6, scale: 0.99 }}
-              transition={{ duration: 0.25 }}
-              className="w-full px-4 py-2.5 sm:py-3 rounded-xl border border-cyan-400/25 bg-gradient-to-r from-[#00f4ff]/5 via-white/[0.02] to-[#ffc922]/5 backdrop-blur-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-2.5 sm:gap-4 shadow-[0_0_20px_rgba(0,244,255,0.05)]"
-            >
-              <div
-                className="flex items-center gap-2.5 min-w-0 flex-1 cursor-help py-0.5"
-                title={currentLensData.summary}
-              >
-                <span className="w-2 h-2 rounded-full bg-[#00f4ff] animate-ping shrink-0" />
-                <span className="text-[11px] sm:text-xs font-mono uppercase tracking-wider text-cyan-300 font-semibold shrink-0">
-                  {currentLensData.tagline}:
-                </span>
-                <span className="text-xs text-gray-300 line-clamp-1 sm:truncate hover:text-white transition-colors duration-200">
-                  {currentLensData.summary}
-                </span>
-              </div>
+          </motion.div>
 
-              {/* Connected Pipeline Flow */}
-              <div className="flex flex-wrap items-center gap-1.5 text-[10px] sm:text-xs font-mono bg-black/60 px-3 py-1.5 rounded-lg border border-white/10 shrink-0">
-                {currentLensData.pipeline.map((step, idx) => (
-                  <React.Fragment key={idx}>
-                    <span className="text-cyan-200">{step}</span>
-                    {idx < currentLensData.pipeline.length - 1 && (
-                      <LuArrowRight className="w-3 h-3 text-[#ffc922] shrink-0" />
-                    )}
-                  </React.Fragment>
-                ))}
-              </div>
-            </motion.div>
-          </AnimatePresence>
-        </motion.div>
-
-        {/* The Bento-Box Grid (4 Modules with compact padding and wider horizontal bounds) */}
+        {/* The Bento-Box Grid (Clean, spacious cards) */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 w-full">
           {SKILL_MODULES.map((module, mIdx) => {
             const ModuleIcon = module.icon
             return (
               <motion.div
                 key={module.id}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 15 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: mIdx * 0.08 }}
-                className={`group relative rounded-2xl p-4 sm:p-5 bg-white/[0.02] border ${module.borderColor} backdrop-blur-2xl transition-all duration-300 hover:shadow-[0_0_30px_rgba(0,244,255,0.1)] flex flex-col justify-between overflow-hidden`}
+                transition={{ duration: 0.35, delay: mIdx * 0.05 }}
+                className={`group relative rounded-xl p-3.5 sm:p-4 bg-white/[0.02] border ${module.borderColor} backdrop-blur-2xl transition-all duration-300 hover:shadow-[0_0_25px_rgba(0,244,255,0.1)] flex flex-col justify-between overflow-hidden`}
               >
                 {/* Background Ambient Tint */}
                 <div
-                  className={`absolute -top-24 -right-24 w-52 h-52 rounded-full bg-gradient-to-br ${module.glowColor} blur-[80px] pointer-events-none group-hover:scale-125 transition-transform duration-500`}
+                  className={`absolute -top-24 -right-24 w-48 h-48 rounded-full bg-gradient-to-br ${module.glowColor} blur-[75px] pointer-events-none group-hover:scale-125 transition-transform duration-500`}
                 />
 
                 <div>
                   {/* Module Header */}
-                  <div className="flex items-center justify-between mb-2.5 relative z-10">
-                    <div className="flex items-center gap-2.5">
+                  <div className="flex items-center justify-between mb-2 relative z-10">
+                    <div className="flex items-center gap-2">
                       <div
-                        className="p-2 rounded-lg border border-white/10 bg-white/[0.05] group-hover:scale-105 transition-transform duration-300"
+                        className="p-1 rounded-md border border-white/10 bg-white/[0.05]"
                         style={{ color: module.accentColor }}
                       >
-                        <ModuleIcon className="w-5 h-5" />
+                        <ModuleIcon className="w-4 h-4" />
                       </div>
                       <div>
-                        <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">
+                        <h3 className="text-sm font-bold text-white tracking-tight leading-tight">
                           {module.title}
                         </h3>
-                        <span className="text-[11px] font-mono text-gray-400">
+                        <span className="text-[9.5px] font-mono text-gray-400">
                           {module.badge}
                         </span>
                       </div>
                     </div>
                   </div>
 
-                  <p className="text-xs text-gray-400 mb-3.5 leading-relaxed relative z-10 line-clamp-2">
-                    {module.description}
-                  </p>
-
-                  {/* Skills Grid */}
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-2.5 relative z-10">
+                  {/* Skills Grid - Sleek interactive horizontal pill chips */}
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 relative z-10">
                     {module.skills.map((skill) => {
                       const SkillIcon = skill.icon
                       const isHighlighted =
@@ -577,47 +516,41 @@ const Skills = () => {
                         <motion.button
                           key={skill.name}
                           onClick={() => setSelectedSkill(skill)}
-                          whileHover={{ scale: 1.03, y: -2 }}
-                          whileTap={{ scale: 0.97 }}
-                          className={`relative p-2.5 rounded-xl border text-left transition-all duration-200 flex flex-col justify-between min-h-[74px] sm:min-h-[78px] cursor-pointer ${
+                          whileHover={{ scale: 1.02, y: -1 }}
+                          whileTap={{ scale: 0.98 }}
+                          className={`relative px-2 py-1.5 rounded-lg border text-left transition-all duration-200 flex items-center justify-between cursor-pointer ${
                             isHighlighted
-                              ? 'bg-white/[0.04] border-white/10 hover:border-cyan-400/50 hover:bg-cyan-950/20 hover:shadow-[0_0_15px_rgba(0,244,255,0.18)]'
+                              ? 'bg-white/[0.04] border-white/10 hover:border-cyan-400/50 hover:bg-cyan-950/30 hover:shadow-[0_0_12px_rgba(0,244,255,0.15)]'
                               : 'opacity-35 grayscale-[50%] bg-black/40 border-white/5 hover:opacity-75'
                           }`}
                         >
-                          {/* Skill Header */}
-                          <div className="flex items-center justify-between w-full">
+                          {/* Left: Icon + Skill Name */}
+                          <div className="flex items-center gap-1.5 min-w-0 flex-1 mr-1">
                             <SkillIcon
-                              className={`w-5 h-5 transition-colors duration-200 ${
+                              className={`w-3.5 h-3.5 shrink-0 transition-colors ${
                                 isHighlighted ? 'text-white' : 'text-gray-500'
                               }`}
                             />
-                            {/* Telemetry Status Indicator */}
-                            <span
-                              className={`w-2 h-2 rounded-full ${
-                                skill.statusColor === 'emerald'
-                                  ? 'bg-emerald-400 shadow-[0_0_8px_#34d399]'
-                                  : skill.statusColor === 'cyan'
-                                  ? 'bg-[#00f4ff] shadow-[0_0_8px_#00f4ff]'
-                                  : 'bg-[#ffc922] shadow-[0_0_8px_#ffc922]'
-                              }`}
-                              title={skill.tier}
-                            />
+                            <span className="text-[11px] font-semibold text-gray-200 truncate">
+                              {skill.name}
+                            </span>
                           </div>
 
-                          {/* Skill Info */}
-                          <div className="mt-1.5">
-                            <div className="text-xs sm:text-[13px] font-semibold text-gray-200 truncate">
-                              {skill.name}
-                            </div>
-                            <div className="text-[10px] font-mono text-gray-400 truncate">
-                              {skill.tier}
-                            </div>
-                          </div>
+                          {/* Right: Telemetry Status Indicator */}
+                          <span
+                            className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                              skill.statusColor === 'emerald'
+                                ? 'bg-emerald-400 shadow-[0_0_6px_#34d399]'
+                                : skill.statusColor === 'cyan'
+                                ? 'bg-[#00f4ff] shadow-[0_0_6px_#00f4ff]'
+                                : 'bg-[#ffc922] shadow-[0_0_6px_#ffc922]'
+                            }`}
+                            title={skill.tier}
+                          />
 
                           {/* Subtle active border glow */}
                           {isHighlighted && activeLens !== 'all' && (
-                            <div className="absolute inset-0 rounded-xl border border-cyan-400/40 pointer-events-none" />
+                            <div className="absolute inset-0 rounded-lg border border-cyan-400/40 pointer-events-none" />
                           )}
                         </motion.button>
                       )
@@ -626,16 +559,16 @@ const Skills = () => {
                 </div>
 
                 {/* Footer Telemetry Legend */}
-                <div className="mt-3.5 pt-2.5 border-t border-white/[0.06] flex items-center justify-between text-[10px] sm:text-[11px] font-mono text-gray-400 relative z-10">
-                  <span className="flex items-center gap-1.5">
+                <div className="mt-2 pt-1 border-t border-white/[0.06] flex items-center justify-between text-[9px] font-mono text-gray-400 relative z-10">
+                  <span className="flex items-center gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                     Daily Driver
                   </span>
-                  <span className="flex items-center gap-1.5">
+                  <span className="flex items-center gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
                     Deep Focus
                   </span>
-                  <span className="flex items-center gap-1.5">
+                  <span className="flex items-center gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#ffc922]" />
                     Certified / R&D
                   </span>

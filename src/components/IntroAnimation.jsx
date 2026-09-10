@@ -72,8 +72,15 @@ function IntroAnimation({ onFinish }) {
                             ease: [0.22, 1, 0.36, 1]
                         },
                     }}
-
                 >
+                    {/* Skip Intro Button */}
+                    <button
+                        onClick={onFinish}
+                        className="absolute top-6 right-6 z-50 px-3.5 py-1.5 rounded-full border border-white/20 bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white font-mono text-xs tracking-wider backdrop-blur-md transition-all cursor-pointer shadow-lg active:scale-95"
+                    >
+                        SKIP ⇥
+                    </button>
+
                     {phase === 'video' && (
                         <motion.video
                             ref={videoRef}

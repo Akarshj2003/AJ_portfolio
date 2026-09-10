@@ -3,7 +3,7 @@ import React from 'react'
 import Cursor from './components/Cursor'
 import Navbar from './components/Navbar.jsx'
 import Particles from './components/Particles.jsx'
-import Projects from './Projects.jsx'
+import Projects from './sections/Projects.jsx'
 import About from './sections/About.jsx'
 import Contacts from './sections/Contacts.jsx'
 import Footer from './sections/Footer.jsx'
@@ -15,13 +15,36 @@ import ChatWindow from './components/ChatWindow.jsx'
 
 
 function App() {
+  // Intro cooldown: only replay if 4 hours have passed since last visit
+  const [introDone, setIntroDone] = React.useState(() => {
+    try {
+      const lastSeen = localStorage.getItem('aj_portfolio_intro_last_seen');
+      if (lastSeen) {
+        const hoursPassed = (Date.now() - parseInt(lastSeen, 10)) / (1000 * 60 * 60);
+        if (hoursPassed < 4) {
+          return true; // Skip intro on refresh within 4 hours
+        }
+      }
+    } catch {
+      // Fallback to false if localStorage is blocked
+    }
+    return false;
+  });
 
-  const [introDone ,setIntroDone]=React.useState(false);
-  const [isChatOpen, setIsChatOpen] =React.useState(false);
+  const [isChatOpen, setIsChatOpen] = React.useState(false);
+
+  const handleIntroFinish = () => {
+    try {
+      localStorage.setItem('aj_portfolio_intro_last_seen', Date.now().toString());
+    } catch {
+      // Ignore storage errors
+    }
+    setIntroDone(true);
+  };
 
   return (
     <>
-    {!introDone && <IntroAnimation onFinish={()=>setIntroDone(true)}/>}
+    {!introDone && <IntroAnimation onFinish={handleIntroFinish} />}
     
     {introDone && (
 

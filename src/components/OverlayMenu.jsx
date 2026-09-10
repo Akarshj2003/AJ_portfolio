@@ -7,10 +7,10 @@ function OverlayMenu({isOpen, onClose}) {
     const origin = ismobile ? "95% 5%" : "50% 5%";
 
   return (
-   <AnimatePresence>
-    {isOpen && (
-        <motion.div 
-        className='fixed inset-0 flex items-center justify-center z-50'
+    <AnimatePresence>
+     {isOpen && (
+         <motion.div 
+         className='fixed inset-0 flex items-center justify-center z-[9999]'
          initial={{clipPath: `circle(0% at ${origin})`}}
          animate={{clipPath: `circle(150% at ${origin})`}}
          exit={{clipPath: `circle(0% at ${origin})`}}
