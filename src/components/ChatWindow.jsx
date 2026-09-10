@@ -68,7 +68,7 @@ function sanitizePlaceholders(text, senderName = "") {
   return res.trim();
 }
 
-function InteractiveContactForm({ intentContext = null }) {
+function InteractiveContactForm({ intentContext = null, messages = [] }) {
   const [formState, setFormState] = useState({
     name: "", email: "", subject: "", body: "", tone: "professional",
   });
@@ -85,11 +85,33 @@ function InteractiveContactForm({ intentContext = null }) {
     if (key === "body") setCharCount(value.length);
   };
 
+  const getContext = () => {
+    let snippet = intentContext?.conversationSnippet || "";
+    let intent = intentContext?.intentHint || "contact";
+
+    if (!snippet && Array.isArray(messages) && messages.length > 0) {
+      snippet = messages
+        .filter((m) => m.role === "user" || m.role === "assistant")
+        .slice(-6)
+        .map((m) => `${m.role === "user" ? "Visitor" : "Assistant"}: ${m.content}`)
+        .join("\n");
+    }
+
+    if (intent === "contact" && snippet) {
+      if (/hire|job|role|position|recruit|opportu/i.test(snippet)) intent = "hire";
+      else if (/collaborat|partner|work together|team up/i.test(snippet)) intent = "collaborate";
+      else if (/question|ask|wonder|curious/i.test(snippet)) intent = "question";
+    }
+
+    return { snippet, intent };
+  };
+
   // ── AI Draft from Chat: auto-generates body+subject from conversation context
   const handleAIDraft = async () => {
     if (drafting) return;
     setDrafting(true);
     setErrorMsg("");
+    const { snippet, intent } = getContext();
     try {
       const res = await fetch("https://aj-backend.vercel.app/api/ask-gemini", {
         method: "POST",
@@ -97,8 +119,8 @@ function InteractiveContactForm({ intentContext = null }) {
         body: JSON.stringify({
           action: "draft_email",
           draftData: {
-            conversationSnippet: intentContext?.conversationSnippet || "",
-            intentHint: intentContext?.intentHint || "contact",
+            conversationSnippet: snippet,
+            intentHint: intent,
             tone: formState.tone,
             senderName: formState.name || "",
           },
@@ -122,6 +144,7 @@ function InteractiveContactForm({ intentContext = null }) {
     if ((!formState.body.trim() && !formState.subject.trim()) || polishing) return;
     setPolishing(true);
     setErrorMsg("");
+    const { snippet, intent } = getContext();
     try {
       const res = await fetch("https://aj-backend.vercel.app/api/ask-gemini", {
         method: "POST",
@@ -133,8 +156,8 @@ function InteractiveContactForm({ intentContext = null }) {
             subject: formState.subject,
             tone: formState.tone,
             senderName: formState.name || "",
-            conversationSnippet: intentContext?.conversationSnippet || "",
-            intentHint: intentContext?.intentHint || "contact",
+            conversationSnippet: snippet,
+            intentHint: intent,
           },
         }),
       });
@@ -158,6 +181,7 @@ function InteractiveContactForm({ intentContext = null }) {
     if (polishingSubject) return;
     setPolishingSubject(true);
     setErrorMsg("");
+    const { snippet, intent } = getContext();
     try {
       const res = await fetch("https://aj-backend.vercel.app/api/ask-gemini", {
         method: "POST",
@@ -168,8 +192,8 @@ function InteractiveContactForm({ intentContext = null }) {
             subject: formState.subject,
             body: formState.body,
             tone: formState.tone,
-            conversationSnippet: intentContext?.conversationSnippet || "",
-            intentHint: intentContext?.intentHint || "contact",
+            conversationSnippet: snippet,
+            intentHint: intent,
           },
         }),
       });
@@ -901,6 +925,7 @@ export default function ChatWindow({ onClose }) {
               {msg.showContactForm && (
                 <InteractiveContactForm
                   intentContext={msg.intentContext || intentContextStore}
+                  messages={messages}
                 />
               )}
 
