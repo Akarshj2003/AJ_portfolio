@@ -9,6 +9,8 @@ import { RiRobot2Line, RiCompass3Line, RiMagicLine, RiCodeSSlashLine } from "rea
 import { FaGithub, FaExternalLinkAlt, FaStar, FaPaperPlane } from "react-icons/fa";
 import { AnimatePresence, motion } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
+import rehypeSanitize from 'rehype-sanitize';
+import ThinkingBlock from './ThinkingBlock';
 
 // ── Brand & Liquid Glass Tokens ─────────────────────────────────
 const CYAN   = '#00f4ff';
@@ -45,20 +47,79 @@ function ThinkingPulse({ activeThought }) {
   );
 }
 
-// ── Scenario 1: Interactive Contact & AI Writing Studio Card ────
-function InteractiveContactForm({ initialMessage = "" }) {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [subject, setSubject] = useState("");
-  const [message, setMessage] = useState(initialMessage);
-  const [tone, setTone] = useState("professional");
-  const [polishing, setPolishing] = useState(false);
-  const [sending, setSending] = useState(false);
-  const [sentSuccess, setSentSuccess] = useState(false);
-  const [errorMsg, setErrorMsg] = useState("");
+// ── Scenario 1: Context-Aware Contact & AI Writing Studio Card ──
+const TONE_META = {
+  professional: { icon: "💼", label: "Professional" },
+  casual:       { icon: "☕", label: "Casual" },
+  collaborative:{ icon: "🤝", label: "Collaborative" },
+};
 
+function sanitizePlaceholders(text, senderName = "") {
+  if (!text) return "";
+  let res = text;
+  const name = (senderName || "").trim();
+  if (name) {
+    res = res.replace(/\[\s*(?:your\s*name|name|sender(?:\s*name)?|insert\s*name)\s*\]/gi, name);
+  } else {
+    // If no name is provided, clean up dangling sign-offs with placeholder
+    res = res.replace(/(?:thanks|thank\s*you|regards|best|warm\s*regards|sincerely),?\s*\n*\s*\[\s*(?:your\s*name|name|sender(?:\s*name)?|insert\s*name)\s*\]/gi, "");
+    res = res.replace(/\[\s*(?:your\s*name|name|sender(?:\s*name)?|insert\s*name)\s*\]/gi, "");
+  }
+  return res.trim();
+}
+
+function InteractiveContactForm({ intentContext = null }) {
+  const [formState, setFormState] = useState({
+    name: "", email: "", subject: "", body: "", tone: "professional",
+  });
+  const [polishing, setPolishing]               = useState(false);
+  const [polishingSubject, setPolishingSubject] = useState(false);
+  const [drafting, setDrafting]                 = useState(false);
+  const [sending, setSending]                   = useState(false);
+  const [sentSuccess, setSentSuccess]           = useState(false);
+  const [errorMsg, setErrorMsg]                 = useState("");
+  const [charCount, setCharCount]               = useState(0);
+
+  const setField = (key, value) => {
+    setFormState(prev => ({ ...prev, [key]: value }));
+    if (key === "body") setCharCount(value.length);
+  };
+
+  // ── AI Draft from Chat: auto-generates body+subject from conversation context
+  const handleAIDraft = async () => {
+    if (drafting) return;
+    setDrafting(true);
+    setErrorMsg("");
+    try {
+      const res = await fetch("https://aj-backend.vercel.app/api/ask-gemini", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "draft_email",
+          draftData: {
+            conversationSnippet: intentContext?.conversationSnippet || "",
+            intentHint: intentContext?.intentHint || "contact",
+            tone: formState.tone,
+            senderName: formState.name || "",
+          },
+        }),
+      });
+      const data = await res.json();
+      if (data.body) {
+        const cleanBody = sanitizePlaceholders(data.body, formState.name);
+        setField("body", cleanBody);
+      }
+      if (data.subject) setField("subject", data.subject);
+    } catch (err) {
+      console.warn("AI draft failed:", err);
+    } finally {
+      setDrafting(false);
+    }
+  };
+
+  // ── AI Polish: refines message body AND subject line (Context-Aware)
   const handlePolish = async () => {
-    if (!message.trim() || polishing) return;
+    if ((!formState.body.trim() && !formState.subject.trim()) || polishing) return;
     setPolishing(true);
     setErrorMsg("");
     try {
@@ -67,12 +128,23 @@ function InteractiveContactForm({ initialMessage = "" }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           action: "polish_message",
-          polishData: { text: message, tone },
+          polishData: {
+            text: formState.body,
+            subject: formState.subject,
+            tone: formState.tone,
+            senderName: formState.name || "",
+            conversationSnippet: intentContext?.conversationSnippet || "",
+            intentHint: intentContext?.intentHint || "contact",
+          },
         }),
       });
       const data = await res.json();
       if (data.polished) {
-        setMessage(data.polished);
+        const cleanBody = sanitizePlaceholders(data.polished, formState.name);
+        setField("body", cleanBody);
+      }
+      if (data.polishedSubject) {
+        setField("subject", data.polishedSubject);
       }
     } catch (err) {
       console.warn("AI polish failed:", err);
@@ -81,158 +153,317 @@ function InteractiveContactForm({ initialMessage = "" }) {
     }
   };
 
-  const handleSendEmail = async (e) => {
+  // ── AI Polish Subject: dedicated polish for subject field (Context-Aware)
+  const handlePolishSubject = async () => {
+    if (polishingSubject) return;
+    setPolishingSubject(true);
+    setErrorMsg("");
+    try {
+      const res = await fetch("https://aj-backend.vercel.app/api/ask-gemini", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "polish_subject",
+          subjectData: {
+            subject: formState.subject,
+            body: formState.body,
+            tone: formState.tone,
+            conversationSnippet: intentContext?.conversationSnippet || "",
+            intentHint: intentContext?.intentHint || "contact",
+          },
+        }),
+      });
+      const data = await res.json();
+      if (data.polishedSubject) {
+        setField("subject", data.polishedSubject);
+      }
+    } catch (err) {
+      console.warn("Subject polish failed:", err);
+    } finally {
+      setPolishingSubject(false);
+    }
+  };
+
+  // ── Send Email
+  const handleSend = async (e) => {
     e.preventDefault();
-    if (!email.trim() || !message.trim() || sending) return;
+    if (!formState.email.trim() || !formState.body.trim() || sending) return;
     setSending(true);
     setErrorMsg("");
-
     try {
       const res = await fetch("https://aj-backend.vercel.app/api/ask-gemini", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           action: "send_contact",
-          contactData: { name, email, subject, message, tone },
+          contactData: {
+            name: formState.name,
+            email: formState.email,
+            subject: formState.subject,
+            message: formState.body,
+            tone: formState.tone,
+          },
         }),
       });
       const data = await res.json();
       if (res.ok && data.success) {
         setSentSuccess(true);
       } else {
-        setErrorMsg(data.details || "Failed to dispatch email. Please try again.");
+        setErrorMsg(data.details || "Failed to send. Please try again.");
       }
-    } catch (err) {
-      setErrorMsg("Network error. Please try again or reach out via LinkedIn.");
+    } catch {
+      setErrorMsg("Network error. Try again or find Akarsh on LinkedIn.");
     } finally {
       setSending(false);
     }
   };
 
+  // ── Success State ──
   if (sentSuccess) {
     return (
       <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
+        initial={{ opacity: 0, scale: 0.93 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="mt-3 p-4 rounded-xl border border-emerald-500/30 bg-emerald-950/20 text-center backdrop-blur-md"
+        className="mt-4 p-5 rounded-2xl border border-emerald-400/25 bg-emerald-950/20 text-center backdrop-blur-md"
       >
-        <IoCheckmarkCircle className="text-3xl text-emerald-400 mx-auto mb-2" />
-        <h4 className="text-white font-semibold text-sm">Message Sent Directly to Akarsh!</h4>
-        <p className="text-xs text-gray-300 mt-1">
-          Thanks for reaching out! Akarsh has received your note at his inbox and will reply to <span className="text-[#00f4ff] font-mono">{email}</span> shortly.
+        <IoCheckmarkCircle className="text-4xl text-emerald-400 mx-auto mb-3" />
+        <h4 className="text-white font-semibold text-sm mb-1">Message Delivered!</h4>
+        <p className="text-xs text-gray-300 leading-relaxed">
+          Akarsh has your note in his inbox and will reply to{" "}
+          <span className="text-[#00f4ff] font-mono">{formState.email}</span> shortly.
         </p>
       </motion.div>
     );
   }
 
+  const intentBadge = {
+    hire: "hiring opportunity",
+    collaborate: "collaboration",
+    question: "your question",
+    contact: "reaching out",
+  }[intentContext?.intentHint] || "reaching out";
+
   return (
     <motion.form
-      onSubmit={handleSendEmail}
-      initial={{ opacity: 0, y: 10 }}
+      onSubmit={handleSend}
+      initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      className="mt-3 p-4 rounded-xl border border-cyan-400/30 bg-slate-900/80 backdrop-blur-xl shadow-xl flex flex-col gap-3 text-left"
+      transition={{ duration: 0.3 }}
+      className="mt-4 rounded-2xl overflow-hidden border border-cyan-400/20 shadow-[0_8px_40px_rgba(0,244,255,0.08)] text-left"
+      style={{ background: "rgba(8,15,30,0.97)" }}
     >
-      <div className="flex items-center justify-between pb-2 border-b border-white/10">
-        <div className="flex items-center gap-1.5 text-xs font-semibold text-[#00f4ff] uppercase tracking-wider">
-          <IoMailOutline className="text-sm" /> Direct Contact Studio
+      {/* ── Header ── */}
+      <div className="flex items-center justify-between px-4 py-3 border-b border-white/8"
+        style={{ background: "rgba(0,244,255,0.04)" }}
+      >
+        <div className="flex items-center gap-2 text-[13px] font-semibold text-[#00f4ff] tracking-wide">
+          <IoMailOutline className="text-base" />
+          Direct Contact Studio
         </div>
-        <span className="text-[10px] text-gray-400 font-mono">dispatched to Akarsh's Gmail</span>
+        <div className="flex items-center gap-1.5">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          <span className="text-[11px] text-emerald-300/80 font-mono">context-aware</span>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-        <div>
-          <label className="text-[11px] font-medium text-gray-300 block mb-1">Your Name</label>
+      {/* ── Context banner (only when conversation context is available) ── */}
+      {intentContext?.conversationSnippet && (
+        <div className="flex items-start gap-2.5 mx-4 mt-3 px-3 py-2.5 rounded-xl"
+          style={{ background: "rgba(0,244,255,0.06)", border: "1px solid rgba(0,244,255,0.12)" }}
+        >
+          <IoSparkles className="text-[#00f4ff] text-sm shrink-0 mt-0.5" />
+          <p className="text-[11.5px] text-cyan-200/75 leading-relaxed">
+            I understand you're interested in <span className="text-[#00f4ff] font-medium">{intentBadge}</span>. Hit <strong className="text-white font-semibold">AI Draft</strong> below to auto-write a message based on our chat, or type your own.
+          </p>
+        </div>
+      )}
+
+      <div className="px-4 pt-4 pb-4 flex flex-col gap-4">
+
+        {/* ── Row 1: Name + Email ── */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[11.5px] font-medium text-gray-300">Your Name</label>
+            <input
+              type="text"
+              required
+              placeholder="e.g. Alex Rivera"
+              value={formState.name}
+              onChange={e => {
+                const newName = e.target.value;
+                setField("name", newName);
+                // Dynamically sync user's name into body if [Your Name] placeholder exists
+                if (formState.body && /\[\s*(?:your\s*name|name|sender(?:\s*name)?|insert\s*name)\s*\]/i.test(formState.body)) {
+                  setField("body", sanitizePlaceholders(formState.body, newName));
+                }
+              }}
+              className="w-full px-3.5 py-2.5 rounded-xl text-[13px] text-white placeholder-gray-500 transition-all"
+              style={{
+                background: "rgba(15,22,45,0.9)",
+                border: "1px solid rgba(255,255,255,0.12)",
+                outline: "none",
+              }}
+              onFocus={e => { e.target.style.borderColor = "rgba(0,244,255,0.55)"; e.target.style.boxShadow = "0 0 0 3px rgba(0,244,255,0.08)"; }}
+              onBlur={e  => { e.target.style.borderColor = "rgba(255,255,255,0.12)"; e.target.style.boxShadow = "none"; }}
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[11.5px] font-medium text-gray-300">Your Email <span className="text-red-400">*</span></label>
+            <input
+              type="email"
+              required
+              placeholder="e.g. alex@company.com"
+              value={formState.email}
+              onChange={e => setField("email", e.target.value)}
+              className="w-full px-3.5 py-2.5 rounded-xl text-[13px] text-white placeholder-gray-500 transition-all"
+              style={{
+                background: "rgba(15,22,45,0.9)",
+                border: "1px solid rgba(255,255,255,0.12)",
+                outline: "none",
+              }}
+              onFocus={e => { e.target.style.borderColor = "rgba(0,244,255,0.55)"; e.target.style.boxShadow = "0 0 0 3px rgba(0,244,255,0.08)"; }}
+              onBlur={e  => { e.target.style.borderColor = "rgba(255,255,255,0.12)"; e.target.style.boxShadow = "none"; }}
+            />
+          </div>
+        </div>
+
+        {/* ── Row 2: Subject with dedicated AI Polish Subject action ── */}
+        <div className="flex flex-col gap-1.5">
+          <div className="flex items-center justify-between">
+            <label className="text-[11.5px] font-medium text-gray-300">Subject</label>
+            <button
+              type="button"
+              onClick={handlePolishSubject}
+              disabled={polishingSubject}
+              className="text-[11px] font-medium text-cyan-300/90 hover:text-cyan-200 flex items-center gap-1 cursor-pointer transition-colors disabled:opacity-50"
+              title="Polish or auto-generate subject line"
+            >
+              <IoSparkles className={`text-[10px] text-[#00f4ff] ${polishingSubject ? "animate-spin" : ""}`} />
+              <span>{polishingSubject ? "Polishing..." : "✦ AI Polish Subject"}</span>
+            </button>
+          </div>
           <input
             type="text"
-            required
-            placeholder="e.g. Alex Rivera"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full bg-slate-950/70 text-xs px-3 py-2 rounded-lg border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-[#00f4ff]"
+            placeholder="e.g. Collaboration on AI Project"
+            value={formState.subject}
+            onChange={e => setField("subject", e.target.value)}
+            className="w-full px-3.5 py-2.5 rounded-xl text-[13px] text-white placeholder-gray-500 transition-all"
+            style={{
+              background: "rgba(15,22,45,0.9)",
+              border: "1px solid rgba(255,255,255,0.12)",
+              outline: "none",
+            }}
+            onFocus={e => { e.target.style.borderColor = "rgba(0,244,255,0.55)"; e.target.style.boxShadow = "0 0 0 3px rgba(0,244,255,0.08)"; }}
+            onBlur={e  => { e.target.style.borderColor = "rgba(255,255,255,0.12)"; e.target.style.boxShadow = "none"; }}
           />
         </div>
-        <div>
-          <label className="text-[11px] font-medium text-gray-300 block mb-1">Your Email</label>
-          <input
-            type="email"
+
+        {/* ── Row 3: Message ── */}
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center justify-between">
+            <label className="text-[11.5px] font-medium text-gray-300">Your Message <span className="text-red-400">*</span></label>
+            <span className={`text-[10.5px] font-mono ${ charCount > 450 ? "text-amber-400" : "text-gray-500" }`}>
+              {charCount} / 500
+            </span>
+          </div>
+
+          {/* ── AI Action Buttons ── */}
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={handleAIDraft}
+              disabled={drafting}
+              className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-[11.5px] font-semibold transition-all active:scale-95 disabled:opacity-50"
+              style={{
+                background: "rgba(255,201,34,0.12)",
+                border: "1px solid rgba(255,201,34,0.3)",
+                color: "#ffc922",
+              }}
+            >
+              <RiMagicLine className={`text-sm ${drafting ? "animate-spin" : ""}`} />
+              {drafting ? "Drafting..." : "✦ AI Draft from Chat"}
+            </button>
+            <button
+              type="button"
+              onClick={handlePolish}
+              disabled={(!formState.body.trim() && !formState.subject.trim()) || polishing}
+              className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-[11.5px] font-semibold transition-all active:scale-95 disabled:opacity-50"
+              style={{
+                background: "rgba(0,244,255,0.08)",
+                border: "1px solid rgba(0,244,255,0.22)",
+                color: "#00f4ff",
+              }}
+            >
+              <IoSparkles className={`text-xs ${polishing ? "animate-spin" : ""}`} />
+              {polishing ? "Polishing..." : "✦ AI Polish (Body & Subject)"}
+            </button>
+          </div>
+
+          <textarea
+            rows={4}
             required
-            placeholder="e.g. alex@company.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full bg-slate-950/70 text-xs px-3 py-2 rounded-lg border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-[#00f4ff]"
+            maxLength={500}
+            placeholder="Hi Akarsh, I'd love to connect regarding..."
+            value={formState.body}
+            onChange={e => setField("body", e.target.value)}
+            className="w-full px-3.5 py-3 rounded-xl text-[13px] text-white placeholder-gray-500 leading-relaxed resize-none transition-all"
+            style={{
+              background: "rgba(15,22,45,0.9)",
+              border: "1px solid rgba(255,255,255,0.12)",
+              outline: "none",
+            }}
+            onFocus={e => { e.target.style.borderColor = "rgba(0,244,255,0.55)"; e.target.style.boxShadow = "0 0 0 3px rgba(0,244,255,0.08)"; }}
+            onBlur={e  => { e.target.style.borderColor = "rgba(255,255,255,0.12)"; e.target.style.boxShadow = "none"; }}
           />
         </div>
-      </div>
 
-      <div>
-        <label className="text-[11px] font-medium text-gray-300 block mb-1">Subject</label>
-        <input
-          type="text"
-          placeholder="e.g. Collaboration on AI Project / Job Opportunity"
-          value={subject}
-          onChange={(e) => setSubject(e.target.value)}
-          className="w-full bg-slate-950/70 text-xs px-3 py-2 rounded-lg border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-[#00f4ff]"
-        />
-      </div>
-
-      <div>
-        <div className="flex justify-between items-center mb-1">
-          <label className="text-[11px] font-medium text-gray-300">Your Message</label>
-          {/* Tone Selector Pills */}
-          <div className="flex items-center gap-1">
-            <span className="text-[10px] text-gray-400 mr-1">Tone:</span>
-            {["professional", "casual", "collaborative"].map((t) => (
+        {/* ── Row 4: Tone Selector ── */}
+        <div className="flex flex-col gap-2">
+          <label className="text-[11.5px] font-medium text-gray-300">Tone</label>
+          <div className="flex gap-2">
+            {Object.entries(TONE_META).map(([key, meta]) => (
               <button
+                key={key}
                 type="button"
-                key={t}
-                onClick={() => setTone(t)}
-                className={`text-[10px] px-2 py-0.5 rounded capitalize transition-all ${
-                  tone === t
-                    ? "bg-[#00f4ff]/20 text-[#00f4ff] border border-[#00f4ff]/40 font-semibold"
-                    : "text-gray-400 hover:text-white"
+                onClick={() => setField("tone", key)}
+                className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-[11.5px] font-medium transition-all active:scale-95 ${
+                  formState.tone === key
+                    ? "text-black font-semibold shadow-[0_0_12px_rgba(0,244,255,0.25)]"
+                    : "text-gray-400 hover:text-gray-200"
                 }`}
+                style={formState.tone === key
+                  ? { background: "linear-gradient(135deg, #00f4ff, #00bf8f)", border: "1px solid transparent" }
+                  : { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.10)" }
+                }
               >
-                {t}
+                <span>{meta.icon}</span>
+                {meta.label}
               </button>
             ))}
           </div>
         </div>
 
-        <textarea
-          rows={3}
-          required
-          placeholder="Hi Akarsh, I'd love to connect regarding..."
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          className="w-full bg-slate-950/70 text-xs px-3 py-2 rounded-lg border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-[#00f4ff] leading-relaxed resize-none"
-        />
-      </div>
+        {/* ── Error ── */}
+        {errorMsg && (
+          <p className="text-[11px] text-red-400 font-mono bg-red-950/20 px-3 py-2 rounded-lg border border-red-500/20">
+            {errorMsg}
+          </p>
+        )}
 
-      {errorMsg && (
-        <p className="text-[11px] text-red-400 font-mono">{errorMsg}</p>
-      )}
-
-      <div className="flex items-center justify-between gap-2 pt-1">
-        {/* AI Polish Button */}
-        <button
-          type="button"
-          disabled={!message.trim() || polishing}
-          onClick={handlePolish}
-          className="text-xs px-3 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-[#ffc922] border border-amber-500/30 flex items-center gap-1.5 transition-all disabled:opacity-40 active:scale-95"
-          title="Enhance grammar and tone using AI"
-        >
-          <RiMagicLine className={`text-sm ${polishing ? "animate-spin" : ""}`} />
-          {polishing ? "Polishing..." : "AI Polish & Grammar"}
-        </button>
-
-        {/* Send Button */}
+        {/* ── Send Button ── */}
         <button
           type="submit"
-          disabled={!email.trim() || !message.trim() || sending}
-          className="text-xs px-4 py-1.5 rounded-lg bg-gradient-to-r from-[#00f4ff] to-[#00bf8f] text-black font-bold flex items-center gap-1.5 transition-all shadow-[0_0_15px_rgba(0,244,255,0.25)] hover:opacity-90 disabled:opacity-40 active:scale-95"
+          disabled={!formState.email.trim() || !formState.body.trim() || sending}
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-[13.5px] font-bold text-black transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+          style={{
+            background: !formState.email.trim() || !formState.body.trim() || sending
+              ? "rgba(0,244,255,0.2)"
+              : "linear-gradient(135deg, #00f4ff 0%, #00bf8f 100%)",
+            boxShadow: "0 0 20px rgba(0,244,255,0.2)",
+          }}
         >
-          <FaPaperPlane className="text-[10px]" />
-          {sending ? "Sending..." : "Send to Akarsh 🚀"}
+          <FaPaperPlane className="text-xs" />
+          {sending ? "Sending..." : "Send to Akarsh →"}
         </button>
       </div>
     </motion.form>
@@ -333,12 +564,38 @@ function SkillTags({ skills = [], onSkillClick }) {
 
 function sanitizeMessageContent(content) {
   if (!content) return "";
-  return content
+  let clean = content
+    // Strip structured data tags (always strip these — they're handled as UI components)
     .replace(/<projects>[\s\S]*?(?:<\/projects>|$)/gi, "")
     .replace(/<skills>[\s\S]*?(?:<\/skills>|$)/gi, "")
-    .replace(/<suggestions>[\s\S]*?(?:<\/suggestions>|$)/gi, "")
+    .replace(/<suggestions>[\s\S]*?(?:<\/suggestions>|$)/gi, "");
+
+  // Secondary safety net: strip raw markdown leakage from models that ignore instructions.
+  // This runs client-side as the last line of defence before text is displayed.
+  clean = clean
+    // Strip ATX headings (# Heading)
+    .replace(/^#{1,6}\s+/gm, "")
+    // Unwrap **bold** and __bold__ → plain text
+    .replace(/\*\*(.+?)\*\*/gs, "$1")
+    .replace(/__(.+?)__/gs, "$1")
+    // Unwrap *italic* and _italic_ → plain text
+    .replace(/\*(.+?)\*/gs, "$1")
+    .replace(/_([^_]+)_/gs, "$1")
+    // Strip ~~strikethrough~~
+    .replace(/~~(.+?)~~/gs, "$1")
+    // Strip ```code blocks``` entirely (content too noisy for chat)
+    .replace(/```[\s\S]*?```/g, "")
+    // Unwrap `inline code` → plain text
+    .replace(/`([^`]+)`/g, "$1")
+    // Strip setext-style heading underlines (=== or ---)
+    .replace(/^[=]{3,}\s*$/gm, "")
+    // Collapse excess blank lines
+    .replace(/\n{3,}/g, "\n\n")
     .trim();
+
+  return clean;
 }
+
 
 // ── Main ChatWindow Component ───────────────────────────────────
 export default function ChatWindow({ onClose }) {
@@ -355,7 +612,9 @@ export default function ChatWindow({ onClose }) {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [activeThought, setActiveThought] = useState('');
+  const [liveThinkingSteps, setLiveThinkingSteps] = useState([]);
   const [showScrollBottomBtn, setShowScrollBottomBtn] = useState(false);
+  const [intentContextStore, setIntentContextStore] = useState(null);
 
   const messagesEndRef = useRef(null);
   const scrollContainerRef = useRef(null);
@@ -422,12 +681,13 @@ export default function ChatWindow({ onClose }) {
     const userMsg = { id: Date.now().toString(), role: 'user', content: query };
     setMessages((prev) => [...prev, userMsg]);
     setLoading(true);
-    setActiveThought('exploring context for you...');
+    setActiveThought('analyzing your question...');
+    setLiveThinkingSteps(['analyzing your question...']);
 
     // Force scroll down so user immediately sees their question
     setTimeout(() => scrollToBottom(true), 50);
 
-    // Subtle dynamic thinking phase
+    // Dynamic thinking phase fallback interval
     const thoughts = [
       'analyzing your question...',
       'checking portfolio knowledge...',
@@ -437,7 +697,7 @@ export default function ChatWindow({ onClose }) {
     const interval = setInterval(() => {
       thoughtIdx = (thoughtIdx + 1) % thoughts.length;
       setActiveThought(thoughts[thoughtIdx]);
-    }, 1200);
+    }, 1500);
 
     try {
       const historyPayload = messages
@@ -451,6 +711,7 @@ export default function ChatWindow({ onClose }) {
         body: JSON.stringify({
           query,
           history: historyPayload,
+          action: 'stream_chat',
         }),
       });
 
@@ -460,7 +721,55 @@ export default function ChatWindow({ onClose }) {
         throw new Error(`Server returned ${res.status}`);
       }
 
-      const data = await res.json();
+      let data = null;
+      const contentType = res.headers.get('content-type') || '';
+      const collectedSteps = [];
+
+      if (contentType.includes('text/event-stream') && res.body) {
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder('utf-8');
+        let buffer = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop() || '';
+
+          for (const line of lines) {
+            const trimmed = line.trim();
+            if (trimmed.startsWith('data: ')) {
+              try {
+                const parsed = JSON.parse(trimmed.slice(6));
+                if (parsed.type === 'thinking') {
+                  if (parsed.step) {
+                    setActiveThought(parsed.step);
+                    if (!collectedSteps.includes(parsed.step)) {
+                      collectedSteps.push(parsed.step);
+                    }
+                    setLiveThinkingSteps([...collectedSteps]);
+                  }
+                } else if (parsed.type === 'done') {
+                  data = parsed;
+                } else if (parsed.type === 'error') {
+                  throw new Error(parsed.message || 'Stream processing error');
+                }
+              } catch (e) {
+                // Ignore partial JSON parse errors
+              }
+            }
+          }
+        }
+      } else {
+        // Standard JSON fallback
+        data = await res.json();
+      }
+
+      if (!data) {
+        throw new Error('No response data received');
+      }
 
       const botMsg = {
         id: (Date.now() + 1).toString(),
@@ -471,7 +780,12 @@ export default function ChatWindow({ onClose }) {
         cards: data.cards || [],
         skills: data.skills || [],
         suggestions: data.suggestions && data.suggestions.length ? data.suggestions : DEFAULT_SUGGESTIONS,
+        intentContext: data.intentContext || null,
+        thinkingSteps: data.thinkingSteps || (collectedSteps.length > 0 ? collectedSteps : null),
       };
+
+      // Persist the latest intentContext so the form always has fresh context
+      if (data.intentContext) setIntentContextStore(data.intentContext);
 
       setMessages((prev) => [...prev, botMsg]);
     } catch (err) {
@@ -489,6 +803,7 @@ export default function ChatWindow({ onClose }) {
     } finally {
       setLoading(false);
       setActiveThought('');
+      setLiveThinkingSteps([]);
     }
   };
 
@@ -565,13 +880,28 @@ export default function ChatWindow({ onClose }) {
                   : 'bg-slate-900/90 text-gray-100 rounded-bl-none border border-white/10 font-normal'
               }`}
             >
-              <div className="prose prose-invert prose-sm max-w-none text-gray-100 [&>p]:mb-2 [&>ul]:list-disc [&>ul]:pl-4 [&>ol]:list-decimal [&>ol]:pl-4 [&>strong]:text-white [&>strong]:font-semibold">
-                <ReactMarkdown>{sanitizeMessageContent(msg.content)}</ReactMarkdown>
+              {/* Reasoning / Thinking Trace for Assistant Messages */}
+              {msg.role === 'assistant' && msg.thinkingSteps && msg.thinkingSteps.length > 0 && (
+                <div className="mb-2">
+                  <ThinkingBlock
+                    isLive={false}
+                    steps={msg.thinkingSteps}
+                    defaultExpanded={false}
+                  />
+                </div>
+              )}
+
+              <div className="prose prose-invert prose-sm max-w-none text-gray-100 [&>p]:mb-2 [&>p:last-child]:mb-0 [&>ul]:list-disc [&>ul]:pl-4 [&>ol]:list-decimal [&>ol]:pl-4 [&>strong]:text-white [&>strong]:font-semibold [&>a]:text-cyan-400 [&>a]:underline-offset-2 [&>h1]:text-base [&>h2]:text-sm [&>h3]:text-sm [&>h1]:font-semibold [&>h2]:font-semibold [&>h3]:font-medium [&>code]:bg-slate-800 [&>code]:text-cyan-300 [&>code]:px-1 [&>code]:py-0.5 [&>code]:rounded [&>code]:text-xs [&>pre]:bg-slate-800 [&>pre]:rounded-lg [&>pre]:p-3 [&>pre]:text-xs [&>pre]:overflow-x-auto">
+                <ReactMarkdown rehypePlugins={[rehypeSanitize]}>
+                  {sanitizeMessageContent(msg.content)}
+                </ReactMarkdown>
               </div>
 
-              {/* Scenario 1: Render Interactive Contact & AI Writing Studio Card */}
+              {/* Scenario 1: Render Context-Aware Contact Studio */}
               {msg.showContactForm && (
-                <InteractiveContactForm />
+                <InteractiveContactForm
+                  intentContext={msg.intentContext || intentContextStore}
+                />
               )}
 
               {/* Scenario 2: Render Project Bento Cards */}
@@ -608,8 +938,13 @@ export default function ChatWindow({ onClose }) {
         ))}
 
         {loading && (
-          <div className="flex flex-col items-start">
-            <ThinkingPulse activeThought={activeThought} />
+          <div className="flex flex-col items-start w-full max-w-[88%]">
+            <ThinkingBlock
+              isLive={true}
+              activeStep={activeThought}
+              steps={liveThinkingSteps}
+              defaultExpanded={true}
+            />
           </div>
         )}
 
