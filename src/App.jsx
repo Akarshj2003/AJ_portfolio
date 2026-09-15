@@ -32,6 +32,17 @@ function App() {
   });
 
   const [isChatOpen, setIsChatOpen] = React.useState(false);
+  const [chatInitialPrompt, setChatInitialPrompt] = React.useState(null);
+
+  const handleOpenChat = (prompt = null) => {
+    setChatInitialPrompt(prompt || null);
+    setIsChatOpen(true);
+  };
+
+  const handleCloseChat = () => {
+    setIsChatOpen(false);
+    setChatInitialPrompt(null);
+  };
 
   const handleIntroFinish = () => {
     try {
@@ -53,17 +64,17 @@ function App() {
     <Cursor/>
 
     <Navbar/>
-    <Home/>
+    <Home onAskAI={handleOpenChat} />
     <About/>
     <Skills/>
-    <Projects/>
+    <Projects onAskAI={handleOpenChat} />
     <Contacts/>
     <Footer/>
     {!isChatOpen && (
-      <ChatToggleButton onOpen={() => setIsChatOpen(true)} />
+      <ChatToggleButton onOpen={() => handleOpenChat()} />
     )}
     {isChatOpen && (
-      <ChatWindow onClose={() => setIsChatOpen(false)} />
+      <ChatWindow onClose={handleCloseChat} initialPrompt={chatInitialPrompt} />
     )}
 
    </div>

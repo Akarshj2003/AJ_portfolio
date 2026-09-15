@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { projects } from '../data/projectsData';
 import ShootingStars from '../components/ShootingStars';
+import { RiRobot2Line } from 'react-icons/ri';
 import { 
   FiExternalLink, 
   FiGithub, 
@@ -179,7 +180,7 @@ const LiveCardSimulation = ({ type }) => {
   );
 };
 
-const Projects = () => {
+const Projects = ({ onAskAI }) => {
   const N = projects.length;
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -208,11 +209,14 @@ const Projects = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Geometry parameters: calibrated to fit within a single screen viewport
+  // Geometry parameters: calibrated wide for mobile with side cards peeking off-screen
   const isMobile = windowWidth < 640;
   const isTablet = windowWidth < 1024;
-  const RADIUS_X = isMobile ? 120 : isTablet ? 180 : Math.max(220, Math.min(270, N * 44));
-  const RADIUS_Y_RATIO = isMobile ? 0.13 : 0.15;
+  // Wide mobile orbit radius (~190px–225px): cards spread out gracefully across the screen
+  const RADIUS_X = isMobile 
+    ? Math.max(190, Math.min(225, Math.round(windowWidth * 0.52))) 
+    : isTablet ? 200 : Math.max(220, Math.min(270, N * 44));
+  const RADIUS_Y_RATIO = isMobile ? 0.14 : 0.15;
   const CRUISE_SPEED = 0.20; // 0.20 deg/frame gives a smooth, noticeable, and natural orbit
 
   // Smoothly rotate the orbit so project `index` lands at 90 deg (the front apex)
@@ -408,7 +412,7 @@ const Projects = () => {
         </motion.h2>
       </div>
 
-      {/* 3D Orbit Stage (Fitted compactly within 100vh window) */}
+      {/* 3D Orbit Stage (Fitted with generous card breathing room) */}
       <div 
         onMouseDown={handlePointerDown}
         onMouseMove={handlePointerMove}
@@ -416,7 +420,7 @@ const Projects = () => {
         onTouchStart={handlePointerDown}
         onTouchMove={handlePointerMove}
         onTouchEnd={handlePointerUp}
-        className="relative w-full max-w-5xl h-[210px] sm:h-[225px] md:h-[240px] my-auto flex items-center justify-center select-none cursor-grab active:cursor-grabbing"
+        className="relative w-full max-w-5xl h-[235px] sm:h-[245px] md:h-[250px] my-auto flex items-center justify-center select-none cursor-grab active:cursor-grabbing"
       >
         {/* Left & Right Edge Navigation Arrows */}
         <button
@@ -450,15 +454,15 @@ const Projects = () => {
                 onMouseEnter={() => setHoveredIndex(idx)}
                 onMouseLeave={() => setHoveredIndex(null)}
                 onClick={() => jumpToProject(idx)}
-                className="absolute top-0 left-0 w-[150px] sm:w-[170px] md:w-[185px] h-[195px] sm:h-[210px] md:h-[220px] cursor-pointer pointer-events-auto will-change-transform"
+                className="absolute top-0 left-0 w-[172px] sm:w-[185px] md:w-[195px] h-[222px] sm:h-[230px] md:h-[238px] cursor-pointer pointer-events-auto will-change-transform"
                 style={{ backfaceVisibility: 'hidden' }}
               >
-                {/* Outer Glass Card */}
+                {/* Outer Glass Card - Opaque backdrop prevents rear text bleed-through */}
                 <div 
-                  className={`relative w-full h-full rounded-xl overflow-hidden backdrop-blur-xl border transition-[border-color,background-color,box-shadow] duration-200 flex flex-col ${
+                  className={`relative w-full h-full rounded-2xl overflow-hidden backdrop-blur-2xl border transition-[border-color,background-color,box-shadow] duration-200 flex flex-col shadow-xl ${
                     isFocused || isHovered 
-                      ? 'border-white/30 bg-[#0d101e]/90 shadow-[0_0_30px_-6px_var(--glow-color)]' 
-                      : 'border-white/10 bg-[#070913]/70 hover:border-white/20'
+                      ? 'border-cyan-400/50 bg-[#0d1224] shadow-[0_0_30px_-4px_var(--glow-color)]' 
+                      : 'border-white/10 bg-[#090c18]/95 hover:border-white/20'
                   }`}
                   style={{
                     '--glow-color': proj.accent
@@ -474,7 +478,7 @@ const Projects = () => {
                   />
 
                   {/* Card Art / Video / Poster / Live Simulation */}
-                  <div className="relative h-[46%] w-full bg-gradient-to-b from-white/5 to-transparent border-b border-white/10 overflow-hidden flex items-center justify-center">
+                  <div className="relative h-[42%] w-full bg-gradient-to-b from-white/5 to-transparent border-b border-white/10 overflow-hidden flex items-center justify-center shrink-0">
                     {/* Video Player on Hover / Focus if video available */}
                     {proj.video && (isHovered || isFocused) ? (
                       <video 
@@ -546,29 +550,29 @@ const Projects = () => {
                     </div>
                   </div>
 
-                  {/* Card Body */}
-                  <div className="p-2.5 sm:p-3 flex flex-col justify-between flex-1 min-h-0 bg-gradient-to-b from-transparent to-black/40">
+                  {/* Card Body with generous padding & breathing room */}
+                  <div className="p-3 sm:p-3.5 flex flex-col justify-between flex-1 min-h-0 bg-gradient-to-b from-transparent to-black/60">
                     <div>
                       <div 
-                        className="font-mono text-[8.5px] tracking-wider uppercase font-semibold mb-0.5 truncate"
+                        className="font-mono text-[8.5px] sm:text-[9px] tracking-wider uppercase font-semibold mb-0.5 truncate"
                         style={{ color: proj.accent }}
                       >
                         {proj.kicker}
                       </div>
 
-                      <h3 className="text-xs sm:text-[13px] font-bold text-white truncate group-hover:text-cyan-300 transition-colors">
+                      <h3 className="text-[13px] sm:text-[14px] font-bold text-white truncate group-hover:text-cyan-300 transition-colors">
                         {proj.title}
                       </h3>
 
-                      <p className="text-[10px] text-gray-400 mt-0.5 line-clamp-2 leading-tight">
+                      <p className="text-[10px] sm:text-[10.5px] text-gray-300/85 mt-0.5 line-clamp-2 leading-tight">
                         {proj.tagline}
                       </p>
                     </div>
 
                     {/* HUD Metric & Tech Tags */}
-                    <div className="pt-1.5">
-                      <div className="text-[9px] font-mono text-gray-300 flex items-center gap-1 mb-1.5 font-medium truncate">
-                        <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: proj.accent }} />
+                    <div className="pt-2 border-t border-white/10 mt-auto">
+                      <div className="text-[9px] sm:text-[9.5px] font-mono text-gray-300 flex items-center gap-1.5 mb-1.5 font-medium truncate">
+                        <span className="w-1.5 h-1.5 rounded-full shrink-0 shadow-[0_0_6px_currentColor]" style={{ background: proj.accent, color: proj.accent }} />
                         <span className="truncate">{proj.metric}</span>
                       </div>
 
@@ -576,13 +580,13 @@ const Projects = () => {
                         {proj.tags.slice(0, 3).map((tag, tIdx) => (
                           <span 
                             key={tIdx}
-                            className="px-1 py-0.2 rounded font-mono text-[8px] bg-white/5 border border-white/10 text-gray-300"
+                            className="px-1.5 py-0.5 rounded font-mono text-[8px] sm:text-[8.5px] bg-white/5 border border-white/10 text-gray-300"
                           >
                             {tag}
                           </span>
                         ))}
                         {proj.tags.length > 3 && (
-                          <span className="px-1 py-0.2 rounded font-mono text-[8px] text-gray-500">
+                          <span className="px-1.5 py-0.5 rounded font-mono text-[8px] text-gray-500">
                             +{proj.tags.length - 3}
                           </span>
                         )}
@@ -681,20 +685,26 @@ const Projects = () => {
           </div>
         </div>
 
-        {/* Right CTA Action Deck */}
-        <div className="flex flex-row md:flex-col gap-1.5 w-full md:w-auto shrink-0 md:self-center">
+        {/* Right CTA Action Deck with safe right margin on mobile */}
+        <div className="flex flex-row md:flex-col gap-2 w-full md:w-auto shrink-0 md:self-center pr-12 md:pr-0">
+          <button
+            type="button"
+            onClick={() => onAskAI && onAskAI(`Can you explain the architecture, tech stack, and key engineering challenges of the "${activeProject.title}" project?`)}
+            className="flex-1 md:flex-initial flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg font-bold text-black text-[10px] font-mono tracking-wider transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg group cursor-pointer bg-gradient-to-r from-[#00f4ff] to-[#1cd8d2] shadow-[0_0_16px_rgba(0,244,255,0.4)]"
+            title="Ask AJ Cortex about this project"
+          >
+            <RiRobot2Line className="w-3.5 h-3.5" />
+            <span>ASK AJ CORTEX</span>
+          </button>
+
           <a
             href={activeProject.githubUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 md:flex-initial flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg font-bold text-black text-[10.5px] font-mono tracking-wider transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg group cursor-pointer"
-            style={{
-              background: activeProject.accent,
-              boxShadow: `0 0 20px -4px ${activeProject.accentSoft}`
-            }}
+            className="flex-1 md:flex-initial flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg font-bold text-white bg-white/10 border border-white/20 text-[10px] font-mono tracking-wider transition-all duration-300 hover:bg-white/15 hover:border-cyan-400 active:scale-95 group cursor-pointer"
           >
             <FiGithub className="w-3.5 h-3.5" />
-            <span>VIEW ON GITHUB</span>
+            <span>GITHUB</span>
             <FiExternalLink className="w-3 h-3 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
           </a>
 
@@ -703,7 +713,7 @@ const Projects = () => {
               href={activeProject.demoUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-1 px-3.5 py-1.5 rounded-lg border border-white/20 text-white hover:border-cyan-400 text-[9.5px] font-mono tracking-wider transition-all hover:bg-white/5 cursor-pointer"
+              className="flex items-center justify-center gap-1 px-3 py-1.5 rounded-lg border border-white/20 text-white hover:border-cyan-400 text-[9.5px] font-mono tracking-wider transition-all hover:bg-white/5 cursor-pointer"
             >
               <span>LIVE DEMO</span>
               <FiExternalLink className="w-3 h-3" />

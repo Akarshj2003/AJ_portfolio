@@ -2,6 +2,7 @@ import React, { useMemo } from 'react'
 import Particles from '../components/Particles'
 import { motion } from 'framer-motion'
 import { FaGithub, FaLinkedin } from 'react-icons/fa'
+import { RiRobot2Line } from 'react-icons/ri'
 import avatar from '../assets/avatar.png'
 
 const icons = [
@@ -26,7 +27,7 @@ const glowVarients = {
 }
 
 
-const Home = () => {
+const Home = ({ onAskAI }) => {
   const roles = useMemo(() => ['Software Developer', 'Web Developer', 'AI Application Developer'], [])
 
   const [index, setIndex] = React.useState(0);
@@ -133,7 +134,7 @@ const Home = () => {
               {/* VIEW MY WORK */}
               <a
                 href="#projects"
-                className="px-6 py-3 rounded-full bg-gradient-to-r from-[#93c1c1] via-[#00f4ff]  to-[#85a9a9]
+                className="px-6 py-3 rounded-full bg-gradient-to-r from-[#93c1c1] via-[#00f4ff] to-[#85a9a9]
                 text-black font-semibold shadow-lg hover:shadow-[0_0_20px_#ffc922] hover:scale-105 transition-transform duration-300"
               >
                 VIEW MY WORK

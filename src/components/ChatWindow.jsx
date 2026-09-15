@@ -622,14 +622,14 @@ function sanitizeMessageContent(content) {
 
 
 // ── Main ChatWindow Component ───────────────────────────────────
-export default function ChatWindow({ onClose }) {
+export default function ChatWindow({ onClose, initialPrompt = null }) {
   // Starts in Half-Screen mode by default, toggleable to Full-Screen
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [messages, setMessages] = useState([
     {
       id: 'welcome',
       role: 'assistant',
-      content: "Hey! I'm Akarsh's AI assistant. Ask me anything about his projects, experience, tech stack, or get in touch!",
+      content: "Hey! I'm AJ Cortex, Akarsh's neural AI assistant. Ask me anything about his projects, system architecture, tech stack, or get in touch!",
       suggestions: DEFAULT_SUGGESTIONS,
     },
   ]);
@@ -640,6 +640,7 @@ export default function ChatWindow({ onClose }) {
   const [showScrollBottomBtn, setShowScrollBottomBtn] = useState(false);
   const [intentContextStore, setIntentContextStore] = useState(null);
 
+  const hasTriggeredInitialPromptRef = useRef(false);
   const messagesEndRef = useRef(null);
   const scrollContainerRef = useRef(null);
   const inputRef = useRef(null);
@@ -696,6 +697,13 @@ export default function ChatWindow({ onClose }) {
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
+
+  useEffect(() => {
+    if (initialPrompt && !hasTriggeredInitialPromptRef.current) {
+      hasTriggeredInitialPromptRef.current = true;
+      handleSend(initialPrompt);
+    }
+  }, [initialPrompt]);
 
   const handleSend = async (textToSend) => {
     const query = (textToSend || input).trim();
@@ -853,10 +861,10 @@ export default function ChatWindow({ onClose }) {
           </div>
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="font-bold text-sm tracking-wide text-white">Akarsh AI</span>
+              <span className="font-bold text-sm tracking-wide text-white">AJ Cortex</span>
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
             </div>
-            <p className="text-[11px] text-cyan-200/60 font-mono">portfolio intelligence</p>
+            <p className="text-[11px] text-cyan-200/60 font-mono">Neural Portfolio Intelligence</p>
           </div>
         </div>
 
