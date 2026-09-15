@@ -3,7 +3,7 @@ import Particles from '../components/Particles'
 import { motion } from 'framer-motion'
 import { FaGithub, FaLinkedin } from 'react-icons/fa'
 import { RiRobot2Line } from 'react-icons/ri'
-import avatar from '../assets/avatar.png'
+import FloatingAstronaut from '../components/FloatingAstronaut'
 
 const icons = [
   { icon: FaGithub, label: 'GitHub', link: 'https://github.com/Akarshj2003' },
@@ -85,10 +85,10 @@ const Home = ({ onAskAI }) => {
 
       </div>
 
-      <div className='relative z-10 h-full w-full max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 '>
-        <div className='flex flex-col justify-center h-full text-center lg:text-left relative'>
+      <div className='relative z-10 h-full w-full max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-2 items-center'>
+        <div className='flex flex-col justify-center h-full text-center md:text-left relative'>
           <div
-            className='w-full lg:pr-24 mx-auto max-w-3xl'>
+            className='w-full md:pr-10 lg:pr-20 mx-auto max-w-3xl'>
             <motion.div
               className='mb-3 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold text-white tracking-wide min-h-[1.6em]  '
               initial={{ opacity: 0, y: 20 }}
@@ -117,7 +117,7 @@ const Home = ({ onAskAI }) => {
               </span>
             </motion.h1>
             <motion.p
-              className='mt-6 text-base sm:text-lg md:text-xl text-gray-300 max-w-2xl mx-auto lg:mx-0'
+              className='mt-6 text-base sm:text-lg md:text-xl text-gray-300 max-w-2xl mx-auto md:mx-0'
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
@@ -126,7 +126,7 @@ const Home = ({ onAskAI }) => {
             </motion.p>
 
             <motion.div
-              className="mt-10 flex flex-wrap items-center justify-center lg:justify-start gap-6 text-lg"
+              className="mt-10 flex flex-wrap items-center justify-center md:justify-start gap-6 text-lg"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.8 }}
@@ -150,7 +150,7 @@ const Home = ({ onAskAI }) => {
               </a>
             </motion.div>
             <div
-              className='mt-10 flex gap-6 justify-center text-2xl md:text-3xl lg:justify-start'
+              className='mt-10 flex gap-6 justify-center text-2xl md:text-3xl md:justify-start'
             >
               {icons.map(({ icon: Icon, label, link }) => (
                 <motion.a
@@ -176,47 +176,8 @@ const Home = ({ onAskAI }) => {
 
         </div>
 
-        <div
-          className='relative hidden lg:block'>
-          <motion.div
-            className='absolute top-[8%] pointer-events-none'
-            style={
-              {
-                right: "5vh",
-                width: "min(20vw,410px)",
-                height: "min(80vh,760px)",
-                borderRadius: "50%",
-                filter: "blur(40px)", opacity: "0.22",
-                background: "conic-gradient(from 0deg ,#00f4ff, #00f4ff,#00f4ff , #00f4ff )"
-              }
-            }
-            initial={{ opacity: 0, scale: 0.98, y: 40 }}
-            animate={{ opacity: 0.22, scale: 1, }}
-            transition={{ duration: 1, delay: 0.6 }}
-
-          />
-          <motion.img src={avatar} alt='aka'
-            className='absolute top-1/2 -translate-y-1/2 object-contain select-none '
-            style={
-              {
-                right: "-30px", width: "min(45w,780px)", maxHeight: "90vh"
-
-              }
-            }
-            initial={{ opacity: 0, scale: 0.98, y: 40 }}
-            animate={{
-              opacity: 1,
-              scale: 1,
-              y: [0, -10, 0],
-
-
-            }}
-            transition={{
-              opacity: { duration: 0.8, delay: 0.2 },
-              y: { duration: 4, delay: 1, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" },
-            }}
-
-          />
+        <div className='relative hidden md:flex items-center justify-center h-full overflow-visible'>
+          <FloatingAstronaut onAskAI={onAskAI} />
         </div>
 
       </div>
