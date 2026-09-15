@@ -11,6 +11,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import rehypeSanitize from 'rehype-sanitize';
 import ThinkingBlock from './ThinkingBlock';
+import { visitorTracker } from '../utils/visitorTracker';
 
 // ── Brand & Liquid Glass Tokens ─────────────────────────────────
 const CYAN   = '#00f4ff';
@@ -712,6 +713,7 @@ export default function ChatWindow({ onClose, initialPrompt = null }) {
     setInput('');
     const userMsg = { id: Date.now().toString(), role: 'user', content: query };
     setMessages((prev) => [...prev, userMsg]);
+    visitorTracker.recordChatQuery(query);
     setLoading(true);
     setActiveThought('analyzing your question...');
     setLiveThinkingSteps(['analyzing your question...']);

@@ -12,9 +12,14 @@ import Skills from './sections/Skills.jsx'
 import IntroAnimation from './components/IntroAnimation.jsx'
 import ChatToggleButton from './components/ChatToggleButton.jsx'
 import ChatWindow from './components/ChatWindow.jsx'
+import { visitorTracker } from './utils/visitorTracker.js'
 
 
 function App() {
+  React.useEffect(() => {
+    visitorTracker.init();
+  }, []);
+
   // Intro cooldown: only replay if 4 hours have passed since last visit
   const [introDone, setIntroDone] = React.useState(() => {
     try {
