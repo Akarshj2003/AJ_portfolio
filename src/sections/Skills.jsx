@@ -28,151 +28,103 @@ import {
   TbBrandCSharp,
 } from 'react-icons/tb'
 import {
-  LuLayers,
   LuSparkles,
   LuTerminal,
   LuDatabase,
-  LuWorkflow,
   LuCheck,
-  LuExternalLink,
   LuInfo,
   LuX,
-  LuNetwork,
   LuCpu,
   LuBoxes,
   LuBrainCircuit,
   LuGlobe,
-  LuArrowRight,
 } from 'react-icons/lu'
 import { RiRobot3Line } from 'react-icons/ri'
 
-// Engineering problem lenses with clean SVG icons (zero emojis)
-const PROBLEM_LENSES = [
-  {
-    id: 'all',
-    label: 'All Systems',
-    icon: LuBoxes,
-    tagline: 'Complete Full-Stack & AI Architecture',
-    summary: 'Holistic view of engineering capabilities across intelligent models, client runtimes, distributed storage, and deployment infrastructure.',
-    pipeline: ['Data & Vector Tier', 'Inference & API Engine', 'Reactive Client UI', 'DevOps & Containers'],
-  },
-  {
-    id: 'ai',
-    label: 'Autonomous AI & RAG',
-    icon: LuBrainCircuit,
-    tagline: 'Edge AI, LLM Orchestration & Intelligent Agents',
-    summary: 'Designing real-time voice assistants, semantic document search (RAG), and hardware-accelerated deep learning models.',
-    pipeline: ['Edge Devices (Jetson)', 'PyTorch & Transformers', 'Vector DB (Astra)', 'Gemini / LLM Engine', 'Voice & Chat UI'],
-  },
-  {
-    id: 'web',
-    label: 'High-Velocity Web',
-    icon: LuGlobe,
-    tagline: 'Micro-Interactions, 60fps Runtimes & Scalable State',
-    summary: 'Crafting responsive, zero-jank frontend applications with atomic Tailwind styling, kinetic Framer Motion, and modern build tooling.',
-    pipeline: ['Vite & Next.js Core', 'React 19 Components', 'TypeScript Type-Safety', 'Tailwind & Motion Physics'],
-  },
-  {
-    id: 'backend',
-    label: 'Resilient APIs & Data',
-    icon: LuDatabase,
-    tagline: 'Secure REST Architectures & Hybrid Databases',
-    summary: 'Architecting high-concurrency microservices, document & relational database schema design, and asynchronous task execution.',
-    pipeline: ['Client Requests', 'Node / Express Middleware', 'PostgreSQL / MongoDB', 'Vector Embeddings Cache'],
-  },
-  {
-    id: 'systems',
-    label: 'Systems & DevOps',
-    icon: LuTerminal,
-    tagline: 'Linux Systems, Containerization & CI/CD',
-    summary: 'Managing enterprise Linux environments, Docker workflows, automated builds, and low-level memory-efficient systems programming.',
-    pipeline: ['Linux / Bash Shell', 'Docker Image Builds', 'Git Version Control', 'Postman Automated Tests'],
-  },
+// Clean, intuitive category filters
+const SKILL_CATEGORIES = [
+  { id: 'all', label: 'All Skills', icon: LuBoxes },
+  { id: 'ai', label: 'AI & Machine Learning', icon: LuBrainCircuit },
+  { id: 'web', label: 'Frontend & Web', icon: LuGlobe },
+  { id: 'backend', label: 'Backend & APIs', icon: LuDatabase },
+  { id: 'tools', label: 'Tools & DevOps', icon: LuTerminal },
 ]
 
-// Comprehensive Skill Registry with real credentials from Akarsh's LinkedIn & GitHub
+// Streamlined Skill Registry — Easy to understand, on-point
 const SKILL_MODULES = [
   {
     id: 'ai-ml',
-    title: 'AI, Machine Learning & Edge Computing',
+    title: 'AI & Machine Learning',
     icon: RiRobot3Line,
     glowColor: 'from-[#00f4ff]/20 to-[#302b63]/40',
     borderColor: 'border-cyan-500/30',
     accentColor: '#00f4ff',
-    badge: 'Core Specialization',
-    description: 'Specializing in LLM agent workflows, Transformer models, edge hardware inference, and automated computer vision pipelines.',
+    badge: 'Focus Area',
     skills: [
       {
         name: 'Python',
         icon: SiPython,
-        tier: 'Daily Driver',
+        tier: 'Core Language',
         statusColor: 'emerald',
         lens: ['all', 'ai', 'backend'],
-        category: 'Core Language',
-        highlight: 'Primary language for ML modeling, data pipelines, automation scripts, and backend microservices.',
-        project: 'Safari Voice Assistant & Heart Disease ML',
+        summary: 'Primary language for AI modeling, backend scripts, and data processing.',
+        project: 'Safari Voice Assistant, Heart Disease ML',
       },
       {
-        name: 'PyTorch & Neural Networks',
+        name: 'PyTorch',
         icon: SiPytorch,
-        tier: 'Deep Specialization',
+        tier: 'Deep Learning',
         statusColor: 'cyan',
         lens: ['all', 'ai'],
-        category: 'Deep Learning',
-        highlight: 'Building classification models, convolutional networks, and fine-tuning transformer architectures.',
-        project: 'AI-Generated Text Detection & RL Dino Game',
+        summary: 'Building neural networks, computer vision, and training ML classifiers.',
+        project: 'AI-Generated Text Detection, RL Dino Game',
       },
       {
-        name: 'Gemini & Generative AI',
+        name: 'Gemini & GenAI',
         icon: LuSparkles,
-        tier: 'Production Active',
+        tier: 'LLMs & Agents',
         statusColor: 'emerald',
         lens: ['all', 'ai'],
-        category: 'LLM Orchestration',
-        highlight: 'Implementing ReAct agents, function-calling, structured JSON generation, and multi-turn contextual chatbots.',
-        project: 'Portfolio AI Assistant Companion',
+        summary: 'Integrating LLMs, smart chat agents, and function calling.',
+        project: 'Portfolio AI Companion, Context Search',
       },
       {
         name: 'RAG & Vector Search',
         icon: TbBinaryTree,
-        tier: 'Production Active',
+        tier: 'Document AI',
         statusColor: 'emerald',
         lens: ['all', 'ai', 'backend'],
-        category: 'Semantic Retrieval',
-        highlight: 'Document chunking, dense vector embeddings generation, similarity querying with Astra DB and hybrid search.',
-        project: 'RAG Pipeline & Repo Intelligence',
+        summary: 'Connecting AI models to PDFs and documents for instant question answering.',
+        project: 'College Voice Assistant, Document Q&A',
       },
       {
-        name: 'Edge AI (Jetson Nano & CUDA)',
+        name: 'Edge AI (NVIDIA)',
         icon: SiNvidia,
-        tier: 'Certified Credential',
+        tier: 'Hardware & Vision',
         statusColor: 'amber',
-        lens: ['all', 'ai', 'systems'],
-        category: 'Embedded Hardware AI',
-        highlight: 'NVIDIA-certified for embedded deep learning deployment, TensorRT optimizations, and real-time inference.',
-        project: 'NVIDIA Jetson Nano Real-Time Vision',
+        lens: ['all', 'ai', 'tools'],
+        summary: 'Running real-time computer vision models on local NVIDIA Jetson devices.',
+        project: 'Real-Time Edge Vision Models',
       },
       {
-        name: 'BERT & Transformers',
+        name: 'NLP & Transformers',
         icon: TbBrain,
-        tier: 'Specialized Study',
+        tier: 'Language Models',
         statusColor: 'cyan',
         lens: ['all', 'ai'],
-        category: 'Natural Language Processing',
-        highlight: 'Text tokenization, sentiment analysis, attention heads analysis, and sequence-to-sequence translation.',
-        project: 'AI Text Detection & Voice Processing',
+        summary: 'Classifying text, understanding intent, and detecting AI vs. human writing.',
+        project: 'Synthetix AI Text Detector',
       },
     ],
   },
   {
     id: 'frontend',
-    title: 'Modern Frontend & Reactive Web Engine',
-    icon: LuLayers,
+    title: 'Frontend & Web Development',
+    icon: LuGlobe,
     glowColor: 'from-[#ffc922]/20 to-[#00f4ff]/20',
     borderColor: 'border-amber-400/30',
     accentColor: '#ffc922',
-    badge: 'High Velocity',
-    description: 'Engineering responsive, accessible, and kinetic user interfaces with modern React paradigms and hardware-accelerated animations.',
+    badge: 'UI & Design',
     skills: [
       {
         name: 'React 19',
@@ -180,215 +132,191 @@ const SKILL_MODULES = [
         tier: 'Daily Driver',
         statusColor: 'emerald',
         lens: ['all', 'web'],
-        category: 'UI Library & Runtime',
-        highlight: 'Hooks architecture, custom animation pipelines, responsive layouts, and performance optimization.',
-        project: 'Portfolio V2, E-Commerce Hub, Booking App',
+        summary: 'Building modern, fast, and responsive user interfaces.',
+        project: 'Portfolio V2, Movie Booking Web App',
       },
       {
         name: 'TypeScript',
         icon: SiTypescript,
-        tier: 'Daily Driver',
+        tier: 'Type-Safe Code',
         statusColor: 'emerald',
         lens: ['all', 'web', 'backend'],
-        category: 'Type-Safe Development',
-        highlight: 'Strict interfaces, generic utilities, component prop safety, and full-stack type contracts.',
-        project: 'Enterprise Systems & Next.js Modules',
+        summary: 'Writing reliable, bug-free frontend and backend code with clear types.',
+        project: 'Web Applications, Shared Data Models',
       },
       {
-        name: 'JavaScript (ES6+)',
+        name: 'JavaScript',
         icon: SiJavascript,
-        tier: 'Daily Driver',
+        tier: 'Core Web',
         statusColor: 'emerald',
-        lens: ['all', 'web', 'backend'],
-        category: 'Core Language',
-        highlight: 'Asynchronous event loop, promises, closures, dynamic DOM manipulation, and modern web APIs.',
-        project: 'All Full-Stack & Frontend Applications',
-      },
-      {
-        name: 'Next.js',
-        icon: SiNextdotjs,
-        tier: 'High Velocity',
-        statusColor: 'cyan',
         lens: ['all', 'web'],
-        category: 'Full-Stack Framework',
-        highlight: 'Server-Side Rendering (SSR), Static Site Generation, App Router patterns, and API routes.',
-        project: 'Scalable Web Applications',
+        summary: 'Creating dynamic page interactions, animations, and modern web apps.',
+        project: 'Interactive UI, Client Logic',
       },
       {
         name: 'Tailwind CSS',
         icon: SiTailwindcss,
-        tier: 'Daily Driver',
+        tier: 'Styling',
         statusColor: 'emerald',
         lens: ['all', 'web'],
-        category: 'Utility Design System',
-        highlight: 'Custom design tokens, responsive breakpoints, glassmorphic filters, and cyber-dark aesthetics.',
-        project: 'Brand Portfolio Design System',
+        summary: 'Crafting custom, responsive dark-mode designs and clean layouts.',
+        project: 'Portfolio & Full-Stack Projects',
       },
       {
-        name: 'Framer Motion',
-        icon: LuWorkflow,
-        tier: 'Daily Driver',
-        statusColor: 'emerald',
+        name: 'Next.js',
+        icon: SiNextdotjs,
+        tier: 'React Framework',
+        statusColor: 'cyan',
         lens: ['all', 'web'],
-        category: 'Motion Physics Engine',
-        highlight: 'Spring physics, stagger choreographies, 3D flip cards, gesture controls, and layout transitions.',
-        project: 'Portfolio Interactive Experiences',
+        summary: 'Server-side rendering, fast routing, and modern web app development.',
+        project: 'Next.js Web Applications',
+      },
+      {
+        name: 'Vite',
+        icon: SiVite,
+        tier: 'Build Tool',
+        statusColor: 'emerald',
+        lens: ['all', 'web', 'tools'],
+        summary: 'Lightning-fast development server and optimized production bundles.',
+        project: 'Portfolio V2 & Modern Web Apps',
       },
     ],
   },
   {
-    id: 'backend-data',
-    title: 'Backend Architecture & Data Systems',
+    id: 'backend',
+    title: 'Backend & Databases',
     icon: LuDatabase,
-    glowColor: 'from-[#00bf8f]/20 to-[#1cd8d2]/20',
-    borderColor: 'border-teal-400/30',
+    glowColor: 'from-[#00bf8f]/20 to-[#302b63]/30',
+    borderColor: 'border-emerald-500/30',
     accentColor: '#00bf8f',
-    badge: 'Enterprise Grade',
-    description: 'Constructing robust server backends, secure authentication layers, relational schemas, and unstructured vector databases.',
+    badge: 'APIs & Data',
     skills: [
       {
         name: 'Node.js & Express',
         icon: SiNodedotjs,
-        tier: 'Daily Driver',
+        tier: 'API Development',
         statusColor: 'emerald',
-        lens: ['all', 'backend', 'web'],
-        category: 'Server Runtime & Framework',
-        highlight: 'RESTful API construction, middleware pipelining, JWT authentication, and CORS security.',
-        project: 'AJ_Backend & E-Commerce Service',
+        lens: ['all', 'backend'],
+        summary: 'Building lightweight, fast REST APIs and backend servers.',
+        project: 'Portfolio Notification Relay, Booking API',
       },
       {
         name: 'MongoDB',
         icon: SiMongodb,
-        tier: 'Daily Driver',
+        tier: 'NoSQL Database',
         statusColor: 'emerald',
         lens: ['all', 'backend'],
-        category: 'NoSQL Document Store',
-        highlight: 'Mongoose schema design, aggregation pipelines, indexed collections, and atlas cloud clusters.',
-        project: 'E-Commerce Hub & Task Manager',
+        summary: 'Storing flexible document data for web applications and user sessions.',
+        project: 'CinePass Movie Reservation Database',
       },
       {
         name: 'PostgreSQL & SQL',
         icon: SiPostgresql,
-        tier: 'High Velocity',
+        tier: 'Relational DB',
         statusColor: 'cyan',
         lens: ['all', 'backend'],
-        category: 'Relational Database',
-        highlight: 'Relational schema normalization, complex JOIN queries, ACID compliance, and connection pooling.',
-        project: 'Relational Data Stores & TCS Systems',
-      },
-      {
-        name: 'MySQL & SQLite',
-        icon: SiMysql,
-        tier: 'Production Active',
-        statusColor: 'emerald',
-        lens: ['all', 'backend'],
-        category: 'Structured Databases',
-        highlight: 'Embedded and standalone relational database querying, indexing, and transactional integrity.',
-        project: 'Local Testing & Educational Databases',
-      },
-      {
-        name: 'C# & .NET Framework',
-        icon: TbBrandCSharp,
-        tier: 'Enterprise Certified',
-        statusColor: 'amber',
-        lens: ['all', 'backend'],
-        category: 'Enterprise Engineering',
-        highlight: 'Object-oriented application development, ADO.NET database connectivity, and structured enterprise logic.',
-        project: 'Enterprise Services & TCS Training',
+        summary: 'Designing structured tables, relationships, and reliable queries.',
+        project: 'Relational Schema & Data Projects',
       },
       {
         name: 'RESTful APIs',
-        icon: LuNetwork,
-        tier: 'Daily Driver',
+        icon: SiExpress,
+        tier: 'Architecture',
         statusColor: 'emerald',
-        lens: ['all', 'backend', 'web'],
-        category: 'API Protocol',
-        highlight: 'Idempotent routing, HTTP status codes, structured JSON payloads, rate limiting, and error handling.',
-        project: 'All Web & Backend Integrations',
-      },
-    ],
-  },
-  {
-    id: 'devops-tools',
-    title: 'Systems, DevOps & Engineering Tooling',
-    icon: LuTerminal,
-    glowColor: 'from-[#302b63]/30 to-[#00f4ff]/20',
-    borderColor: 'border-purple-400/30',
-    accentColor: '#93c1c1',
-    badge: 'Reliability & CI/CD',
-    description: 'Ensuring continuous deployment, version control discipline, Linux server mastery, and reproducible build systems.',
-    skills: [
-      {
-        name: 'Linux & CentOS',
-        icon: SiLinux,
-        tier: 'Certified Knowledge',
-        statusColor: 'emerald',
-        lens: ['all', 'systems', 'backend'],
-        category: 'Operating Systems & Shell',
-        highlight: 'CompTIA-certified CentOS 7 administration, shell scripting, process management, and SSH hardening.',
-        project: 'Linux Server Environments & Development',
-      },
-      {
-        name: 'Docker',
-        icon: SiDocker,
-        tier: 'Production Active',
-        statusColor: 'cyan',
-        lens: ['all', 'systems', 'backend'],
-        category: 'Containerization',
-        highlight: 'Multi-stage Dockerfile creation, image optimization, local microservice orchestration with Docker Compose.',
-        project: 'Containerized Deployment Pipelines',
-      },
-      {
-        name: 'Git & GitHub',
-        icon: SiGit,
-        tier: 'Daily Driver',
-        statusColor: 'emerald',
-        lens: ['all', 'systems', 'web', 'backend'],
-        category: 'Version Control',
-        highlight: 'Branching workflows, pull requests, merge conflict resolution, semantic commit history, and GitHub Actions.',
-        project: 'All Open-Source & Portfolio Repositories',
-      },
-      {
-        name: 'Vite & Build Tooling',
-        icon: SiVite,
-        tier: 'Daily Driver',
-        statusColor: 'emerald',
-        lens: ['all', 'systems', 'web'],
-        category: 'Modern Bundler',
-        highlight: 'Hot Module Replacement, Rolldown integration, production tree-shaking, and bundle size minimization.',
-        project: 'Portfolio V2 & Modern Web Apps',
+        lens: ['all', 'backend'],
+        summary: 'Designing clean endpoints connecting frontend apps to backend data.',
+        project: 'Full-Stack Applications',
       },
       {
         name: 'Postman',
         icon: SiPostman,
-        tier: 'Daily Driver',
+        tier: 'API Testing',
         statusColor: 'emerald',
-        lens: ['all', 'systems', 'backend'],
-        category: 'API Testing & Documentation',
-        highlight: 'Automated test suites, collection runners, environment variable configurations, and endpoint contract validation.',
-        project: 'API Development & Verification',
+        lens: ['all', 'backend', 'tools'],
+        summary: 'Testing endpoints, verifying status codes, and debugging APIs.',
+        project: 'API Development & Quality Checks',
       },
       {
-        name: 'Systems Programming (C / Java)',
+        name: 'MySQL & SQLite',
+        icon: SiMysql,
+        tier: 'Structured SQL',
+        statusColor: 'cyan',
+        lens: ['all', 'backend'],
+        summary: 'Managing relational databases for web projects and local tools.',
+        project: 'Database Management Systems',
+      },
+    ],
+  },
+  {
+    id: 'tools',
+    title: 'Tools & Engineering Workflow',
+    icon: LuTerminal,
+    glowColor: 'from-[#302b63]/40 to-[#00f4ff]/20',
+    borderColor: 'border-purple-500/30',
+    accentColor: '#a78bfa',
+    badge: 'DevOps & Foundations',
+    skills: [
+      {
+        name: 'Git & GitHub',
+        icon: SiGit,
+        tier: 'Version Control',
+        statusColor: 'emerald',
+        lens: ['all', 'tools'],
+        summary: 'Code versioning, branch workflows, and collaborating on open-source projects.',
+        project: 'All Repositories & CI/CD',
+      },
+      {
+        name: 'Docker',
+        icon: SiDocker,
+        tier: 'Containers',
+        statusColor: 'cyan',
+        lens: ['all', 'tools'],
+        summary: 'Packaging applications and dependencies into reproducible containers.',
+        project: 'Containerized Services',
+      },
+      {
+        name: 'Linux / Bash',
+        icon: SiLinux,
+        tier: 'Command Line',
+        statusColor: 'emerald',
+        lens: ['all', 'tools'],
+        summary: 'Command-line scripting, server management, and automated workflows.',
+        project: 'Linux Dev Environment & Server Scripts',
+      },
+      {
+        name: 'C / C++',
         icon: LuCpu,
-        tier: 'Academic & Foundation',
+        tier: 'Foundations',
         statusColor: 'amber',
-        lens: ['all', 'systems'],
-        category: 'Low-Level Foundations',
-        highlight: 'Memory management, pointers, compiler construction, and object-oriented design patterns.',
-        project: 'Compiler Lab & Swing Login Systems',
+        lens: ['all', 'tools'],
+        summary: 'Memory management, pointers, and strong computer science fundamentals.',
+        project: 'Academic Projects & Algorithms',
+      },
+      {
+        name: 'C# & .NET',
+        icon: TbBrandCSharp,
+        tier: 'Desktop & Web',
+        statusColor: 'cyan',
+        lens: ['all', 'tools', 'backend'],
+        summary: 'Object-oriented programming, desktop software, and backend services.',
+        project: 'Enterprise Application Labs',
+      },
+      {
+        name: 'VS Code & Tooling',
+        icon: LuTerminal,
+        tier: 'Daily Environment',
+        statusColor: 'emerald',
+        lens: ['all', 'tools'],
+        summary: 'Streamlined development with linters, debuggers, and modern extensions.',
+        project: 'Daily Coding Workflow',
       },
     ],
   },
 ]
 
 const Skills = () => {
-  const [activeLens, setActiveLens] = useState('all')
+  const [activeCategory, setActiveCategory] = useState('all')
   const [selectedSkill, setSelectedSkill] = useState(null)
-
-  const currentLensData = useMemo(() => {
-    return PROBLEM_LENSES.find((l) => l.id === activeLens) || PROBLEM_LENSES[0]
-  }, [activeLens])
 
   return (
     <section
@@ -415,31 +343,33 @@ const Skills = () => {
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-2xl sm:text-3xl lg:text-[34px] font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-[#00f4ff] to-[#ffc922]"
+            className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-[#00f4ff] to-[#ffc922]"
           >
-            Engineering Stack & Systems
+            Skills &amp; Technologies
           </motion.h2>
+          <p className="mt-2 text-gray-400 text-sm max-w-md">
+            The languages, frameworks, and tools I use to build fast web apps and intelligent systems.
+          </p>
         </div>
 
-        {/* Problem-to-Tech Resolver: Filter Bar */}
+        {/* Clean Category Filter Bar */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className="flex flex-col gap-1.5 items-center w-full"
         >
-          {/* Interactive Filter Grid */}
-          <div className="w-full p-1 rounded-xl bg-white/[0.03] border border-white/[0.08] backdrop-blur-xl">
+          <div className="w-full max-w-2xl p-1 rounded-xl bg-white/[0.03] border border-white/[0.08] backdrop-blur-xl">
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1 w-full">
-              {PROBLEM_LENSES.map((lens) => {
-                const isActive = activeLens === lens.id
-                const LensIcon = lens.icon
+              {SKILL_CATEGORIES.map((cat) => {
+                const isActive = activeCategory === cat.id
+                const CatIcon = cat.icon
 
                 return (
                   <button
-                    key={lens.id}
-                    onClick={() => setActiveLens(lens.id)}
-                    className={`relative px-2 py-1.5 rounded-lg text-xs font-medium transition-all duration-300 cursor-pointer flex items-center justify-center gap-1.5 text-center select-none ${
+                    key={cat.id}
+                    onClick={() => setActiveCategory(cat.id)}
+                    className={`relative px-2 py-2 rounded-lg text-xs font-medium transition-all duration-300 cursor-pointer flex items-center justify-center gap-1.5 text-center select-none ${
                       isActive
                         ? 'text-black font-semibold shadow-[0_0_20px_#00f4ff]'
                         : 'text-gray-300 hover:text-white hover:bg-white/[0.05]'
@@ -447,26 +377,25 @@ const Skills = () => {
                   >
                     {isActive && (
                       <motion.div
-                        layoutId="activeLensPill"
+                        layoutId="activeCategoryPill"
                         className="absolute inset-0 rounded-lg bg-gradient-to-r from-[#00f4ff] via-[#1cd8d2] to-[#ffc922]"
                         transition={{ type: 'spring', stiffness: 350, damping: 25 }}
                       />
                     )}
-                    <LensIcon
+                    <CatIcon
                       className={`w-3.5 h-3.5 shrink-0 relative z-10 transition-colors ${
                         isActive ? 'text-black' : 'text-cyan-400'
                       }`}
                     />
-                    <span className="relative z-10 truncate">{lens.label}</span>
+                    <span className="relative z-10 truncate">{cat.label}</span>
                   </button>
                 )
               })}
             </div>
           </div>
+        </motion.div>
 
-          </motion.div>
-
-        {/* The Bento-Box Grid (Clean, spacious cards) */}
+        {/* Skill Cards Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 w-full">
           {SKILL_MODULES.map((module, mIdx) => {
             const ModuleIcon = module.icon
@@ -477,19 +406,19 @@ const Skills = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.35, delay: mIdx * 0.05 }}
-                className={`group relative rounded-xl p-3.5 sm:p-4 bg-white/[0.02] border ${module.borderColor} backdrop-blur-2xl transition-all duration-300 hover:shadow-[0_0_25px_rgba(0,244,255,0.1)] flex flex-col justify-between overflow-hidden`}
+                className={`group relative rounded-xl p-4 bg-white/[0.02] border ${module.borderColor} backdrop-blur-2xl transition-all duration-300 hover:shadow-[0_0_25px_rgba(0,244,255,0.1)] flex flex-col justify-between overflow-hidden`}
               >
-                {/* Background Ambient Tint */}
+                {/* Background Ambient Glow */}
                 <div
                   className={`absolute -top-24 -right-24 w-48 h-48 rounded-full bg-gradient-to-br ${module.glowColor} blur-[75px] pointer-events-none group-hover:scale-125 transition-transform duration-500`}
                 />
 
                 <div>
                   {/* Module Header */}
-                  <div className="flex items-center justify-between mb-2 relative z-10">
+                  <div className="flex items-center justify-between mb-3 relative z-10">
                     <div className="flex items-center gap-2">
                       <div
-                        className="p-1 rounded-md border border-white/10 bg-white/[0.05]"
+                        className="p-1.5 rounded-md border border-white/10 bg-white/[0.05]"
                         style={{ color: module.accentColor }}
                       >
                         <ModuleIcon className="w-4 h-4" />
@@ -498,19 +427,19 @@ const Skills = () => {
                         <h3 className="text-sm font-bold text-white tracking-tight leading-tight">
                           {module.title}
                         </h3>
-                        <span className="text-[9.5px] font-mono text-gray-400">
+                        <span className="text-[10px] font-mono text-gray-400">
                           {module.badge}
                         </span>
                       </div>
                     </div>
                   </div>
 
-                  {/* Skills Grid - Sleek interactive horizontal pill chips */}
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 relative z-10">
+                  {/* Skills Grid */}
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 relative z-10">
                     {module.skills.map((skill) => {
                       const SkillIcon = skill.icon
                       const isHighlighted =
-                        activeLens === 'all' || skill.lens.includes(activeLens)
+                        activeCategory === 'all' || skill.lens.includes(activeCategory)
 
                       return (
                         <motion.button
@@ -518,38 +447,26 @@ const Skills = () => {
                           onClick={() => setSelectedSkill(skill)}
                           whileHover={{ scale: 1.02, y: -1 }}
                           whileTap={{ scale: 0.98 }}
-                          className={`relative px-2 py-1.5 rounded-lg border text-left transition-all duration-200 flex items-center justify-between cursor-pointer ${
+                          className={`relative px-2.5 py-2 rounded-lg border text-left transition-all duration-200 flex items-center justify-between cursor-pointer ${
                             isHighlighted
                               ? 'bg-white/[0.04] border-white/10 hover:border-cyan-400/50 hover:bg-cyan-950/30 hover:shadow-[0_0_12px_rgba(0,244,255,0.15)]'
                               : 'opacity-35 grayscale-[50%] bg-black/40 border-white/5 hover:opacity-75'
                           }`}
                         >
-                          {/* Left: Icon + Skill Name */}
-                          <div className="flex items-center gap-1.5 min-w-0 flex-1 mr-1">
+                          {/* Icon + Skill Name */}
+                          <div className="flex items-center gap-2 min-w-0 flex-1 mr-1">
                             <SkillIcon
-                              className={`w-3.5 h-3.5 shrink-0 transition-colors ${
+                              className={`w-4 h-4 shrink-0 transition-colors ${
                                 isHighlighted ? 'text-white' : 'text-gray-500'
                               }`}
                             />
-                            <span className="text-[11px] font-semibold text-gray-200 truncate">
+                            <span className="text-xs font-semibold text-gray-200 truncate">
                               {skill.name}
                             </span>
                           </div>
 
-                          {/* Right: Telemetry Status Indicator */}
-                          <span
-                            className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-                              skill.statusColor === 'emerald'
-                                ? 'bg-emerald-400 shadow-[0_0_6px_#34d399]'
-                                : skill.statusColor === 'cyan'
-                                ? 'bg-[#00f4ff] shadow-[0_0_6px_#00f4ff]'
-                                : 'bg-[#ffc922] shadow-[0_0_6px_#ffc922]'
-                            }`}
-                            title={skill.tier}
-                          />
-
                           {/* Subtle active border glow */}
-                          {isHighlighted && activeLens !== 'all' && (
+                          {isHighlighted && activeCategory !== 'all' && (
                             <div className="absolute inset-0 rounded-lg border border-cyan-400/40 pointer-events-none" />
                           )}
                         </motion.button>
@@ -558,20 +475,10 @@ const Skills = () => {
                   </div>
                 </div>
 
-                {/* Footer Telemetry Legend */}
-                <div className="mt-2 pt-1 border-t border-white/[0.06] flex items-center justify-between text-[9px] font-mono text-gray-400 relative z-10">
-                  <span className="flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                    Daily Driver
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
-                    Deep Focus
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#ffc922]" />
-                    Certified / R&D
-                  </span>
+                {/* Footer hint */}
+                <div className="mt-3 pt-2 border-t border-white/[0.06] flex items-center justify-between text-[10px] font-mono text-gray-400 relative z-10">
+                  <span>Click any skill to learn more</span>
+                  <span className="text-cyan-400">● Active</span>
                 </div>
               </motion.div>
             )
@@ -595,7 +502,7 @@ const Skills = () => {
               exit={{ scale: 0.9, y: 20 }}
               transition={{ type: 'spring', stiffness: 350, damping: 25 }}
               onClick={(e) => e.stopPropagation()}
-              className="relative w-full max-w-lg p-6 sm:p-7 rounded-3xl bg-[#0a0d1a] border border-cyan-400/40 shadow-[0_0_50px_rgba(0,244,255,0.25)] text-white overflow-hidden"
+              className="relative w-full max-w-md p-6 rounded-2xl bg-[#0a0d1a] border border-cyan-400/40 shadow-[0_0_50px_rgba(0,244,255,0.25)] text-white overflow-hidden"
             >
               {/* Top Accent Line */}
               <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#00f4ff] via-[#ffc922] to-[#00bf8f]" />
@@ -610,78 +517,41 @@ const Skills = () => {
               </button>
 
               {/* Modal Header */}
-              <div className="flex items-center gap-4 mb-5">
-                <div className="p-3 rounded-2xl bg-white/[0.05] border border-white/10 text-cyan-300">
-                  <selectedSkill.icon className="w-8 h-8" />
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2.5 rounded-xl bg-white/[0.05] border border-white/10 text-cyan-300">
+                  <selectedSkill.icon className="w-7 h-7" />
                 </div>
                 <div>
-                  <div className="text-xs font-mono uppercase tracking-wider text-cyan-400">
-                    {selectedSkill.category}
+                  <div className="text-[11px] font-mono uppercase tracking-wider text-cyan-400">
+                    {selectedSkill.tier}
                   </div>
-                  <h3 className="text-2xl font-bold tracking-tight">
+                  <h3 className="text-xl font-bold tracking-tight">
                     {selectedSkill.name}
                   </h3>
                 </div>
               </div>
 
-              {/* Status and Tier Badge */}
-              <div className="flex items-center gap-3 mb-6 text-xs font-mono">
-                <span className="px-3 py-1 rounded-full border border-cyan-400/30 bg-cyan-950/40 text-cyan-300 flex items-center gap-1.5">
-                  <span
-                    className={`w-2 h-2 rounded-full ${
-                      selectedSkill.statusColor === 'emerald'
-                        ? 'bg-emerald-400'
-                        : selectedSkill.statusColor === 'cyan'
-                        ? 'bg-cyan-400'
-                        : 'bg-amber-400'
-                    }`}
-                  />
-                  {selectedSkill.tier}
-                </span>
-                <span className="text-gray-400">
-                  Architecture Role Verified
-                </span>
-              </div>
-
-              {/* Architectural Highlight */}
-              <div className="space-y-4 text-sm">
+              {/* What I Use It For */}
+              <div className="space-y-3 text-sm">
                 <div>
                   <div className="text-xs font-mono text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1.5">
                     <LuInfo className="w-3.5 h-3.5 text-cyan-400" />
-                    Production Implementation
+                    What I use it for
                   </div>
-                  <p className="text-gray-200 leading-relaxed bg-white/[0.03] p-3.5 rounded-xl border border-white/5">
-                    {selectedSkill.highlight}
+                  <p className="text-gray-200 leading-relaxed bg-white/[0.03] p-3 rounded-xl border border-white/5 text-xs sm:text-sm">
+                    {selectedSkill.summary}
                   </p>
                 </div>
 
                 <div>
                   <div className="text-xs font-mono text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1.5">
                     <LuCheck className="w-3.5 h-3.5 text-[#ffc922]" />
-                    Applied in Real Project / Pipeline
+                    Featured In Projects
                   </div>
-                  <div className="text-cyan-300 font-medium bg-cyan-950/20 p-3 rounded-xl border border-cyan-400/20">
+                  <div className="text-gray-300 bg-white/[0.03] p-3 rounded-xl border border-white/5 text-xs font-mono">
                     {selectedSkill.project}
                   </div>
                 </div>
-              </div>
-
-              {/* Modal Footer CTA */}
-              <div className="mt-7 pt-4 border-t border-white/10 flex items-center justify-between">
-                <a
-                  href="#projects"
-                  onClick={() => setSelectedSkill(null)}
-                  className="inline-flex items-center gap-2 text-xs font-bold text-white hover:text-cyan-400 transition-colors"
-                >
-                  View Featured Projects <LuExternalLink className="w-3.5 h-3.5" />
-                </a>
-
-                <button
-                  onClick={() => setSelectedSkill(null)}
-                  className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-semibold text-white transition-colors cursor-pointer"
-                >
-                  Close Inspector
-                </button>
               </div>
             </motion.div>
           </motion.div>

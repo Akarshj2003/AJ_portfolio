@@ -212,6 +212,18 @@ class VisitorTracker {
 
     // Mobile & desktop page unload
     window.addEventListener('pagehide', triggerExit);
+
+    // Desktop tab closure / page reload
+    window.addEventListener('beforeunload', triggerExit);
+
+    // Provide global manual trigger for instant testing
+    if (typeof window !== 'undefined') {
+      window.__dispatchExitReport = () => {
+        this.hasDispatched = false;
+        console.log('[VisitorTracker] Manual exit report triggered!');
+        this.dispatchExitReport(true);
+      };
+    }
   }
 
   formatDuration(ms) {
@@ -291,38 +303,74 @@ class VisitorTracker {
       .replace(/>/g, '&gt;');
   }
 
-  dispatchExitReport() {
+  dispatchExitReport(force = false) {
     // Prevent multiple dispatches for the same session
     if (this.hasDispatched) return;
 
-    const durationSeconds = (Date.now() - this.startTime) / 1000;
+    const durationSeconds = Math.round((Date.now() - this.startTime) / 1000);
 
-    // Filter out 0-second bounces with no interactions
-    if (durationSeconds < 4 && this.actions.length === 0 && this.chatQueries.length === 0) {
+    // Filter out 0-second crawler bounces unless forced or user interacted
+    if (!force && durationSeconds < 3 && this.actions.length === 0 && this.chatQueries.length === 0 && this.maxScroll < 10) {
       return;
     }
 
     this.hasDispatched = true;
 
     const htmlMessage = this.buildTelegramHTML();
+    const durationStr = this.formatDuration(Date.now() - this.startTime);
+    const flag = this.getCountryFlag(this.geoData?.countryCode);
+    const locationStr = this.geoData?.city
+      ? `${this.geoData.city}, ${this.geoData.country} ${flag}`
+      : (this.geoData?.country || 'Unknown Location');
+
+    const ua = navigator.userAgent;
+    let deviceType = 'Desktop';
+    if (/android/i.test(ua)) deviceType = 'Android';
+    else if (/iphone|ipad|ipod/i.test(ua)) deviceType = 'iOS';
+    else if (/mac/i.test(ua)) deviceType = 'Mac OS';
+    else if (/win/i.test(ua)) deviceType = 'Windows';
+    else if (/linux/i.test(ua)) deviceType = 'Linux';
+
+    const sessionData = {
+      location: locationStr,
+      city: this.geoData?.city || '',
+      country: this.geoData?.country || '',
+      org: this.geoData?.org || 'Standard Network',
+      duration: durationStr,
+      durationSeconds,
+      maxScroll: this.maxScroll,
+      sectionsViewed: Array.from(this.sectionsViewed),
+      actions: this.actions,
+      chatQueries: this.chatQueries,
+      aiIntentSummary: this.aiIntentSummary,
+      knownTag: this.knownVisitor,
+      device: `${deviceType} (${window.innerWidth}x${window.innerHeight})`,
+      referrer: document.referrer || 'Direct',
+    };
+
     const backendEndpoint = import.meta.env.VITE_NOTIFY_API_URL || 'https://aj-backend.vercel.app/api/notify-telegram';
     const localToken = import.meta.env.VITE_TELEGRAM_BOT_TOKEN;
     const localChatId = import.meta.env.VITE_TELEGRAM_CHAT_ID;
 
-    // Log preview in console for easy dev inspection
+    // Dev preview in console
     console.log(
-      '%c[VisitorTracker] Exit Report Captured!',
+      '%c[VisitorTracker] Exit Report Dispatched!',
       'color: #00f4ff; font-weight: bold;',
       '\n\n' + htmlMessage
     );
 
-    // 1. Primary: Send through secure backend (Zero secrets in frontend!)
-    const backendPayload = JSON.stringify({ message: htmlMessage });
+    // 1. Primary: Send through secure backend (Zero secrets in frontend)
+    // CRITICAL: We pass Blob with type 'text/plain'. This is a CORS-safelisted Content-Type
+    // which eliminates the CORS preflight (OPTIONS) request that browsers abort during tab teardown!
+    const backendPayload = JSON.stringify({
+      message: htmlMessage,
+      session: sessionData,
+    });
     let sent = false;
 
     if (navigator.sendBeacon) {
       try {
-        const blob = new Blob([backendPayload], { type: 'application/json' });
+        const blob = new Blob([backendPayload], { type: 'text/plain' });
         sent = navigator.sendBeacon(backendEndpoint, blob);
       } catch {
         sent = false;
@@ -333,7 +381,7 @@ class VisitorTracker {
       try {
         fetch(backendEndpoint, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'text/plain' },
           body: backendPayload,
           keepalive: true,
         }).catch(() => {});
@@ -354,7 +402,7 @@ class VisitorTracker {
 
       if (navigator.sendBeacon) {
         try {
-          const blob = new Blob([directPayload], { type: 'application/json' });
+          const blob = new Blob([directPayload], { type: 'text/plain' });
           navigator.sendBeacon(directEndpoint, blob);
         } catch {}
       }

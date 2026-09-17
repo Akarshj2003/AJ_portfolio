@@ -650,22 +650,22 @@ const Projects = ({ onAskAI }) => {
             {activeProject.tagline}
           </p>
 
-          {/* Problem & Key Technical Challenges Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 mt-1.5 pt-1.5 border-t border-white/10 text-xs">
-            <div className="p-1.5 rounded-lg bg-white/[0.03] border border-white/5">
-              <div className="font-mono uppercase tracking-wider text-[8.5px] mb-0.5 flex items-center gap-1 text-cyan-300 font-semibold">
-                <span>The Problem It Solves</span>
+          {/* Clear & Easy Summary Boxes */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2 pt-2 border-t border-white/10 text-xs">
+            <div className="p-2 rounded-lg bg-white/[0.03] border border-white/5">
+              <div className="font-mono uppercase tracking-wider text-[9px] mb-0.5 text-cyan-300 font-bold flex items-center gap-1">
+                <span>🎯 What It Does</span>
               </div>
-              <p className="text-gray-300 text-[10px] leading-snug line-clamp-1">
+              <p className="text-gray-300 text-[11px] leading-relaxed">
                 {activeProject.problem}
               </p>
             </div>
 
-            <div className="p-1.5 rounded-lg bg-white/[0.03] border border-white/5">
-              <div className="font-mono uppercase tracking-wider text-[8.5px] mb-0.5 flex items-center gap-1 text-amber-300 font-semibold">
-                <span>Technical Challenges Overcome</span>
+            <div className="p-2 rounded-lg bg-white/[0.03] border border-white/5">
+              <div className="font-mono uppercase tracking-wider text-[9px] mb-0.5 text-[#ffc922] font-bold flex items-center gap-1">
+                <span>⚡ How It Works</span>
               </div>
-              <p className="text-gray-300 text-[10px] leading-snug line-clamp-1">
+              <p className="text-gray-300 text-[11px] leading-relaxed">
                 {activeProject.challenges}
               </p>
             </div>

@@ -73,8 +73,8 @@ function App() {
     <About/>
     <Skills/>
     <Projects onAskAI={handleOpenChat} />
-    <Contacts/>
-    <Footer/>
+    <Contacts onAskAI={handleOpenChat} />
+    <Footer onAskAI={handleOpenChat} />
     {!isChatOpen && (
       <ChatToggleButton onOpen={() => handleOpenChat()} />
     )}
