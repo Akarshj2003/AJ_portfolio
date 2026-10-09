@@ -163,6 +163,33 @@ const LiveCardSimulation = ({ type }) => {
     );
   }
 
+  if (type === 'anveshan') {
+    return (
+      <div className="absolute inset-0 flex flex-col justify-between p-2.5 bg-black/80 font-mono text-[9px]">
+        <div className="flex justify-between items-center text-cyan-400 font-semibold">
+          <span>ANVESHAN COLLAB</span>
+          <span className="text-[7.5px] bg-cyan-400/20 px-1 rounded text-cyan-300">EXPLORATION</span>
+        </div>
+        <div className="space-y-1 my-auto">
+          <div className="flex justify-between text-[8px] text-gray-300">
+            <span>Knowledge Graph:</span>
+            <span className="text-cyan-300 font-semibold">SYNCED</span>
+          </div>
+          <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
+            <div className="bg-gradient-to-r from-cyan-400 via-indigo-400 to-pink-500 h-full w-[85%] shadow-[0_0_8px_#00f4ff]" />
+          </div>
+          <div className="text-[7.5px] text-gray-400 truncate">
+            &gt; Agent Nodes: 1,420 · Collab: LIVE
+          </div>
+        </div>
+        <div className="text-[7.5px] text-emerald-400 flex justify-between">
+          <span>STATUS: ACTIVE</span>
+          <span className="text-cyan-300 font-mono">learnermaker/anveshan</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="absolute inset-0 flex flex-col justify-between p-2.5 bg-black/80 font-mono text-[9px]">
       <div className="flex justify-between items-center text-cyan-400 font-semibold">

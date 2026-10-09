@@ -120,5 +120,24 @@ export const projects = [
     hasLiveSimulation: "ecg",
     problem: "Helping people catch early indicators of heart disease before severe symptoms develop.",
     challenges: "Trained and evaluated machine learning classifiers across verified clinical datasets, achieving 98.5% accuracy on early risk prediction."
+  },
+  {
+    id: "anveshan-collab",
+    kicker: "COLLABORATIVE AI / RESEARCH",
+    title: "Anveshan — Collaborative Exploration & Intelligence",
+    tagline: "Collaborative research and intelligence platform for computational discovery, pattern analysis, and knowledge graph mapping.",
+    tags: ["Collaborative AI", "Knowledge Discovery", "Pattern Analysis", "Cloud Run", "Full-Stack"],
+    metric: "Live Discovery Engine · Case Study: Kolam Patterns",
+    accent: "#00f4ff",       // Cyber Cyan
+    accentSoft: "rgba(0, 244, 255, 0.35)",
+    glow: "rgba(0, 244, 255, 0.25)",
+    icon: "ai",
+    githubUrl: "https://github.com/learnermaker/anveshan",
+    demoUrl: "https://anveshan-273553356850.asia-south1.run.app/?view=discovery&case=kolam",
+    poster: null,
+    video: null,
+    hasLiveSimulation: "anveshan",
+    problem: "Enabling distributed teams and researchers to collaboratively explore complex information, synthesize findings, and discover patterns without siloed knowledge.",
+    challenges: "Co-developing an exploratory research architecture with collaborative sync, automated knowledge mapping, and agentic discovery tooling deployed on Google Cloud Run."
   }
 ];
