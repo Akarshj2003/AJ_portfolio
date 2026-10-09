@@ -40,6 +40,7 @@ import {
   LuGlobe,
 } from 'react-icons/lu'
 import { RiRobot3Line } from 'react-icons/ri'
+import SkillsGalaxyBackground from '../components/SkillsGalaxyBackground'
 
 // Clean, intuitive category filters
 const SKILL_CATEGORIES = [
@@ -321,20 +322,10 @@ const Skills = () => {
   return (
     <section
       id="skills"
-      className="relative min-h-screen w-full bg-[#000000] text-white pt-16 pb-8 sm:pt-20 sm:pb-12 px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center"
+      className="relative min-h-screen w-full bg-[#000000] text-white pt-16 pb-8 sm:pt-20 sm:pb-12 px-4 sm:px-6 lg:px-8 flex flex-col items-center"
     >
-      {/* Ambient Cosmic Glow Orbs */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div
-          className="absolute -top-32 left-1/4 w-[500px] h-[500px] rounded-full bg-gradient-to-br from-[#302b63]/30 via-[#00f4ff]/15 to-transparent blur-[160px] animate-pulse"
-          style={{ animationDuration: '9s' }}
-        />
-        <div
-          className="absolute bottom-10 right-10 w-[450px] h-[450px] rounded-full bg-gradient-to-tr from-[#00bf8f]/15 via-[#ffc922]/10 to-transparent blur-[150px] animate-pulse"
-          style={{ animationDuration: '11s' }}
-        />
-        <div className="absolute inset-0 bg-[radial-gradient(#ffffff0a_1px,transparent_1px)] [background-size:24px_24px] opacity-40" />
-      </div>
+      {/* Deep Space Observatory / Telescope Lens Galaxy Background */}
+      <SkillsGalaxyBackground />
 
       <div className="relative z-10 max-w-6xl w-full mx-auto flex flex-col gap-3.5 sm:gap-4 my-auto">
         {/* Section Header */}
@@ -343,7 +334,7 @@ const Skills = () => {
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="fluid-section-heading font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-[#00f4ff] to-[#ffc922]"
+            className="fluid-section-heading font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-[#c084fc] via-[#00f4ff] to-[#ff80bf]"
           >
             Skills &amp; Technologies
           </motion.h2>

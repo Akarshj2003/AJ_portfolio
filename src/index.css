@@ -101,3 +101,22 @@ h2 {
   font-size: clamp(1.75rem, 2.8vw + 0.5rem, 3.25rem);
   line-height: 1.15;
 }
+
+/* ── Deep Space Vortex Cosmic Rotation ── */
+@keyframes vortex-rotate {
+  0% {
+    transform: rotate(0deg) scale(1.15);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.22);
+  }
+  100% {
+    transform: rotate(360deg) scale(1.15);
+  }
+}
+
+.animate-vortex-slow {
+  animation: vortex-rotate 180s linear infinite;
+  will-change: transform;
+}
+
