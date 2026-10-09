@@ -64,12 +64,10 @@ const Contacts = ({ onAskAI }) => {
       `💬 <b>Message:</b>\n<blockquote>${ESCAPE_HTML(formData.payload.trim())}</blockquote>`
 
     const backendEndpoint = import.meta.env.VITE_NOTIFY_API_URL || 'https://aj-backend.vercel.app/api/notify-telegram'
-    const localToken = import.meta.env.VITE_TELEGRAM_BOT_TOKEN
-    const localChatId = import.meta.env.VITE_TELEGRAM_CHAT_ID
 
     let delivered = false
 
-    // Tier 1: Dispatch via Vercel Backend Relay
+    // Dispatch via Vercel Backend Relay (Zero secrets in client-side code)
     try {
       const res = await fetch(backendEndpoint, {
         method: 'POST',
@@ -79,27 +77,7 @@ const Contacts = ({ onAskAI }) => {
 
       if (res.ok) delivered = true
     } catch (err) {
-      console.warn('Backend send failed, attempting direct relay...', err)
-    }
-
-    // Tier 2: Direct fail-safe fallback using client-side Telegram Bot API
-    if (!delivered && localToken && localChatId) {
-      try {
-        const directRes = await fetch(`https://api.telegram.org/bot${localToken}/sendMessage`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chat_id: localChatId,
-            text: telegramHTML,
-            parse_mode: 'HTML',
-            disable_web_page_preview: true,
-          }),
-        })
-
-        if (directRes.ok) delivered = true
-      } catch (directErr) {
-        console.error('Direct Telegram send failed:', directErr)
-      }
+      console.warn('Backend send failed:', err)
     }
 
     setIsTransmitting(false)

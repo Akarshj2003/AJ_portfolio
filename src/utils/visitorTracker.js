@@ -377,8 +377,6 @@ class VisitorTracker {
     };
 
     const backendEndpoint = import.meta.env.VITE_NOTIFY_API_URL || 'https://aj-backend.vercel.app/api/notify-telegram';
-    const localToken = import.meta.env.VITE_TELEGRAM_BOT_TOKEN;
-    const localChatId = import.meta.env.VITE_TELEGRAM_CHAT_ID;
 
     // Dev preview in console
     console.log(
@@ -387,7 +385,7 @@ class VisitorTracker {
       '\n\n' + htmlMessage
     );
 
-    // 1. Primary: Send through secure backend (Zero secrets in frontend)
+    // Primary: Send through secure backend (Zero secrets in frontend)
     // CRITICAL: We pass Blob with type 'text/plain'. This is a CORS-safelisted Content-Type
     // which eliminates the CORS preflight (OPTIONS) request that browsers abort during tab teardown!
     const backendPayload = JSON.stringify({
@@ -415,24 +413,6 @@ class VisitorTracker {
         }).catch(() => {});
       } catch {
         // Silent error handling on page unload
-      }
-    }
-
-    // 2. Secondary fallback: Direct Telegram call if local developer credentials exist
-    if (localToken && localChatId) {
-      const directEndpoint = `https://api.telegram.org/bot${localToken}/sendMessage`;
-      const directPayload = JSON.stringify({
-        chat_id: localChatId,
-        text: htmlMessage,
-        parse_mode: 'HTML',
-        disable_web_page_preview: true,
-      });
-
-      if (navigator.sendBeacon) {
-        try {
-          const blob = new Blob([directPayload], { type: 'text/plain' });
-          navigator.sendBeacon(directEndpoint, blob);
-        } catch {}
       }
     }
   }
