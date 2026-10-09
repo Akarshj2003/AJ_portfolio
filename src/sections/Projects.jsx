@@ -190,19 +190,42 @@ const LiveCardSimulation = ({ type }) => {
     );
   }
 
+  if (type === 'ecg') {
+    return (
+      <div className="absolute inset-0 flex flex-col justify-between p-2.5 bg-black/85 font-mono text-[9px]">
+        <div className="flex justify-between items-center text-emerald-400 font-semibold">
+          <span>CARDIOPULSE ML</span>
+          <span className="text-[7.5px] bg-emerald-400/20 px-1 rounded text-emerald-300 animate-pulse">74 BPM · NORMAL</span>
+        </div>
+        {/* Animated ECG Pulse Line */}
+        <div className="relative h-7 my-auto flex items-center overflow-hidden px-1">
+          <svg className="w-full h-full text-emerald-400" viewBox="0 0 160 30" fill="none">
+            <path
+              d="M0 15 L35 15 L40 8 L45 22 L50 4 L55 26 L60 15 L95 15 L100 8 L105 22 L110 4 L115 26 L120 15 L160 15"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="drop-shadow-[0_0_6px_#38ef7d]"
+            />
+          </svg>
+        </div>
+        <div className="flex justify-between text-[7.5px] text-gray-300">
+          <span>CV ACCURACY: 98.5%</span>
+          <span className="text-emerald-400 font-bold">RISK: LOW (1.2%)</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="absolute inset-0 flex flex-col justify-between p-2.5 bg-black/80 font-mono text-[9px]">
       <div className="flex justify-between items-center text-cyan-400 font-semibold">
-        <span>ASTRA DB VECTOR SEARCH</span>
-        <span className="text-[7.5px] text-cyan-300">CLINICAL TRIAGE</span>
+        <span>PROJECT SIMULATION</span>
+        <span className="text-[7.5px] text-cyan-300">ACTIVE</span>
       </div>
-      <div className="space-y-0.5 my-auto">
-        <div className="text-[8px] text-gray-300">Semantic Cosine: 0.941</div>
-        <div className="p-1 rounded bg-cyan-950/40 border border-cyan-400/30 text-[7.5px] text-cyan-200 truncate">
-          Matched: "Pediatric Fever Triage"
-        </div>
-      </div>
-      <div className="text-[7.5px] text-emerald-400">Hallucination Guard: SAFE</div>
+      <div className="text-[8px] text-gray-300 my-auto text-center">Interactive Telemetry Sync</div>
+      <div className="text-[7.5px] text-emerald-400">Status: Running</div>
     </div>
   );
 };
@@ -369,13 +392,14 @@ const Projects = ({ onAskAI }) => {
           const y = RADIUS_X * RADIUS_Y_RATIO * Math.sin(rad);
 
           // Deep-orbit culling & scaling:
-          // Cards at the far back (depth < 0.18) smoothly fade out to eliminate congestion
-          const baseScale = lerp(0.68, 1.05, depth);
+          // Smooth perspective curve: front card stands at ~1.04 while rear cards scale down cleanly (0.58)
+          const baseScale = lerp(0.58, 1.04, Math.pow(depth, 1.25));
           const scale = baseScale * (1 + fb * 0.14);
           
-          const opacity = depth < 0.18 
+          // Cards on the back arc (depth < 0.28) smoothly fade out to eliminate congestion and overlap
+          const opacity = depth < 0.26 
             ? 0 
-            : Math.min(1, lerp(0.3, 1, depth) + fb * 0.25);
+            : Math.min(1, lerp(0.2, 1, (depth - 0.26) / 0.74) + fb * 0.25);
 
           const zIndex = fb > 0.05 
             ? 900 + Math.round(fb * 90) 
@@ -384,7 +408,7 @@ const Projects = ({ onAskAI }) => {
           sat.style.transform = `translate(-50%, -50%) translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) scale(${scale.toFixed(3)})`;
           sat.style.opacity = opacity;
           sat.style.zIndex = zIndex;
-          sat.style.pointerEvents = depth < 0.22 && fb < 0.1 ? 'none' : 'auto';
+          sat.style.pointerEvents = depth < 0.30 && fb < 0.1 ? 'none' : 'auto';
         }
       }
 
