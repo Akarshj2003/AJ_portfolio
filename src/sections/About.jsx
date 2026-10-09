@@ -28,7 +28,7 @@ const About = () => {
     return (
         <section 
             id='about'
-            className='min-h-screen w-full flex items-center justify-center relative bg-black text-white overflow-hidden py-20'
+            className='min-h-screen w-full flex items-center justify-center relative bg-black text-white overflow-hidden pt-24 pb-16 sm:pt-28 sm:pb-20'
         >
             <div className='absolute inset-0 pointer-events-none'>
                 {glows.map((c, i) => (
@@ -87,7 +87,7 @@ const About = () => {
 
                     {/* Bio & Highlights */}
                     <div className='flex-1 flex flex-col justify-center text-center md:text-left'>
-                        <h2 className='text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-[#00f4ff] to-[#ffc922]'>
+                        <h2 className='fluid-section-heading font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-[#00f4ff] to-[#ffc922]'>
                             Akarsh J
                         </h2>
                         
@@ -100,7 +100,7 @@ const About = () => {
                         </p>
 
                         {/* Quick Highlights Grid */}
-                        <div className='mt-6 grid grid-cols-2 sm:grid-cols-3 gap-3 max-w-xl mx-auto md:mx-0'>
+                        <div className='mt-6 grid grid-cols-3 gap-2 sm:gap-3 max-w-xl mx-auto md:mx-0'>
                             {stack.map((it, i) => (
                                 <motion.div
                                     key={i} 

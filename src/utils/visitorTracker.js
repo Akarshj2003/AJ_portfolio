@@ -172,16 +172,44 @@ class VisitorTracker {
 
       if (res.ok) {
         const text = await res.text();
-        // Parse standard or SSE stream if applicable
-        let cleanText = text;
+        let extractedAnswer = '';
+
         if (text.includes('data:')) {
-          cleanText = text
-            .split('\n')
-            .filter((l) => l.startsWith('data:'))
-            .map((l) => l.replace('data:', '').trim())
-            .join(' ');
+          const lines = text.split('\n');
+          for (const line of lines) {
+            const trimmed = line.trim();
+            if (!trimmed.startsWith('data:')) continue;
+            const payload = trimmed.replace(/^data:\s*/, '').trim();
+            if (!payload) continue;
+            try {
+              const parsed = JSON.parse(payload);
+              if (parsed.type === 'done' && parsed.answer) {
+                extractedAnswer = parsed.answer;
+              } else if (parsed.answer && !extractedAnswer) {
+                extractedAnswer = parsed.answer;
+              }
+            } catch {
+              // Ignore partial JSON chunks
+            }
+          }
         }
-        this.aiIntentSummary = cleanText.trim().replace(/^"|"$/g, '');
+
+        // If not parsed from SSE 'done', try parsing the entire body as JSON
+        if (!extractedAnswer) {
+          try {
+            const parsed = JSON.parse(text);
+            extractedAnswer = parsed.answer || parsed.result || '';
+          } catch {
+            // Not a JSON object, use text if it doesn't look like raw JSON chunks
+            if (!text.includes('{"type":')) {
+              extractedAnswer = text;
+            }
+          }
+        }
+
+        if (extractedAnswer) {
+          this.aiIntentSummary = String(extractedAnswer).trim().replace(/^"|"$/g, '');
+        }
       }
     } catch (err) {
       // Fallback intent summary based on heuristics

@@ -51,7 +51,7 @@ const Home = ({ onAskAI }) => {
   return (
     <section
       id='home'
-      className='w-full h-screen relative bg-black overflow-hidden'
+      className='w-full min-h-screen relative bg-black overflow-hidden flex items-center pt-24 pb-12 sm:pt-28 sm:pb-16'
     >
       <Particles />
       <div className='absolute inset-0'>
@@ -85,12 +85,12 @@ const Home = ({ onAskAI }) => {
 
       </div>
 
-      <div className='relative z-10 h-full w-full max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-2 items-center'>
-        <div className='flex flex-col justify-center h-full text-center md:text-left relative'>
+      <div className='relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 items-center gap-6'>
+        <div className='flex flex-col justify-center text-center md:text-left relative'>
           <div
-            className='w-full md:pr-10 lg:pr-20 mx-auto max-w-3xl'>
+            className='w-full md:pr-6 lg:pr-12 mx-auto max-w-2xl lg:max-w-3xl'>
             <motion.div
-              className='mb-3 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold text-white tracking-wide min-h-[1.6em]  '
+              className='mb-2 fluid-hero-role font-semibold text-cyan-400 tracking-wide min-h-[1.5em]'
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
@@ -104,20 +104,19 @@ const Home = ({ onAskAI }) => {
               </span>
             </motion.div>
             <motion.h1
-              className='text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-transparent bg-clip-text 
+              className='fluid-hero-greeting font-bold text-transparent bg-clip-text 
                 bg-gradient-to-r from-[#00f4ff] to-[#302b63] via-[#ffc922] drop-shadow-lg'
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1 }}
             >
               Hello, I'm
-              <br />
-              <span className='text-white font-bold text-5xl sm:text-6xl md:text-7xl lg:text-8xl lg:whitespace-nowrap'>
+              <span className='text-white font-bold fluid-hero-name block mt-1'>
                 Akarsh J
               </span>
             </motion.h1>
             <motion.p
-              className='mt-6 text-base sm:text-lg md:text-xl text-gray-300 max-w-2xl mx-auto md:mx-0'
+              className='mt-4 sm:mt-5 fluid-hero-bio text-gray-300 max-w-xl mx-auto md:mx-0'
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
@@ -126,7 +125,7 @@ const Home = ({ onAskAI }) => {
             </motion.p>
 
             <motion.div
-              className="mt-10 flex flex-wrap items-center justify-center md:justify-start gap-6 text-lg"
+              className="mt-5 sm:mt-6 flex flex-wrap items-center justify-center md:justify-start gap-3 sm:gap-4 text-sm sm:text-base"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.8 }}
@@ -134,7 +133,7 @@ const Home = ({ onAskAI }) => {
               {/* VIEW MY WORK */}
               <a
                 href="#projects"
-                className="px-6 py-3 rounded-full bg-gradient-to-r from-[#93c1c1] via-[#00f4ff] to-[#85a9a9]
+                className="px-5 sm:px-6 py-2.5 sm:py-3 rounded-full bg-gradient-to-r from-[#93c1c1] via-[#00f4ff] to-[#85a9a9]
                 text-black font-semibold shadow-lg hover:shadow-[0_0_20px_#ffc922] hover:scale-105 transition-transform duration-300"
               >
                 VIEW MY WORK
@@ -144,13 +143,13 @@ const Home = ({ onAskAI }) => {
               <a
                 href={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/resume.pdf`}
                 download
-                className="px-6 py-3 rounded-full border-2 border-[#00f4ff] text-white font-semibold hover:bg-[#00f4ff]/10 hover:shadow-[0_0_15px_#00f4ff] hover:scale-105 transition-transform duration-300"
+                className="px-5 sm:px-6 py-2.5 sm:py-3 rounded-full border-2 border-[#00f4ff] text-white font-semibold hover:bg-[#00f4ff]/10 hover:shadow-[0_0_15px_#00f4ff] hover:scale-105 transition-transform duration-300"
               >
                 MY RESUME
               </a>
             </motion.div>
             <div
-              className='mt-10 flex gap-6 justify-center text-2xl md:text-3xl md:justify-start'
+              className='mt-5 sm:mt-6 flex gap-5 justify-center text-xl md:text-2xl md:justify-start'
             >
               {icons.map(({ icon: Icon, label, link }) => (
                 <motion.a

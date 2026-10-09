@@ -119,8 +119,8 @@ export default function FloatingAstronaut() {
       <motion.div
         className="absolute pointer-events-none border border-cyan-400/10 rounded-full"
         style={{
-          width: 'min(42vw, 520px)',
-          height: 'min(42vw, 520px)',
+          width: 'clamp(300px, 36vw, 540px)',
+          height: 'clamp(300px, 36vw, 540px)',
           willChange: 'transform',
         }}
         animate={{ rotate: 360 }}
@@ -291,8 +291,8 @@ export default function FloatingAstronaut() {
               }}
               className="relative z-10 object-contain select-none cursor-pointer"
               style={{
-                width: 'min(44vw, 680px)',
-                maxHeight: 'min(82vh, 740px)',
+                width: 'clamp(320px, 36vw, 580px)',
+                maxHeight: 'clamp(340px, 62vh, 620px)',
                 filter: isHovered
                   ? 'drop-shadow(0 0 16px rgba(0, 244, 255, 0.4))'
                   : 'drop-shadow(0 0 8px rgba(0, 244, 255, 0.18))',

@@ -212,10 +212,12 @@ const Projects = ({ onAskAI }) => {
   // Geometry parameters: calibrated wide for mobile with side cards peeking off-screen
   const isMobile = windowWidth < 640;
   const isTablet = windowWidth < 1024;
-  // Wide mobile orbit radius (~190px–225px): cards spread out gracefully across the screen
+  // Wide mobile orbit radius with smooth dynamic scaling across desktop and split screens
   const RADIUS_X = isMobile 
-    ? Math.max(190, Math.min(225, Math.round(windowWidth * 0.52))) 
-    : isTablet ? 200 : Math.max(220, Math.min(270, N * 44));
+    ? Math.max(160, Math.min(210, Math.round(windowWidth * 0.46))) 
+    : isTablet 
+      ? Math.max(190, Math.min(235, Math.round(windowWidth * 0.28))) 
+      : Math.max(220, Math.min(290, Math.round(windowWidth * 0.22)));
   const RADIUS_Y_RATIO = isMobile ? 0.14 : 0.15;
   const CRUISE_SPEED = 0.20; // 0.20 deg/frame gives a smooth, noticeable, and natural orbit
 
@@ -382,7 +384,7 @@ const Projects = ({ onAskAI }) => {
   return (
     <section 
       id="projects" 
-      className="relative isolate h-screen max-h-screen min-h-[580px] w-full bg-black text-white pt-16 pb-3 sm:pt-18 sm:pb-3 px-3 sm:px-6 flex flex-col justify-between items-center overflow-hidden"
+      className="relative isolate min-h-screen w-full bg-black text-white py-16 sm:py-20 px-3 sm:px-6 flex flex-col justify-center items-center overflow-hidden gap-4 sm:gap-6"
     >
       {/* Dynamic Ambient Void Glow reacting to active project's color */}
       <div 
@@ -401,12 +403,12 @@ const Projects = ({ onAskAI }) => {
       </div>
 
       {/* Header with signature brand gradient */}
-      <div className="relative z-10 text-center mx-auto mb-1">
+      <div className="relative z-10 text-center mx-auto">
         <motion.h2 
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-2xl sm:text-3xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-[#00f4ff] to-[#ffc922]"
+          className="fluid-section-heading font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-[#00f4ff] to-[#ffc922]"
         >
           Featured Projects
         </motion.h2>
@@ -420,7 +422,7 @@ const Projects = ({ onAskAI }) => {
         onTouchStart={handlePointerDown}
         onTouchMove={handlePointerMove}
         onTouchEnd={handlePointerUp}
-        className="relative w-full max-w-5xl h-[235px] sm:h-[245px] md:h-[250px] my-auto flex items-center justify-center select-none cursor-grab active:cursor-grabbing"
+        className="relative w-full max-w-5xl h-[230px] sm:h-[240px] md:h-[250px] flex items-center justify-center select-none cursor-grab active:cursor-grabbing"
       >
         {/* Left & Right Edge Navigation Arrows */}
         <button

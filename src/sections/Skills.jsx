@@ -321,7 +321,7 @@ const Skills = () => {
   return (
     <section
       id="skills"
-      className="relative min-h-screen w-full bg-[#000000] text-white py-20 lg:py-24 px-4 sm:px-6 lg:px-10 flex flex-col justify-center"
+      className="relative min-h-screen w-full bg-[#000000] text-white pt-16 pb-8 sm:pt-20 sm:pb-12 px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center"
     >
       {/* Ambient Cosmic Glow Orbs */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -336,67 +336,65 @@ const Skills = () => {
         <div className="absolute inset-0 bg-[radial-gradient(#ffffff0a_1px,transparent_1px)] [background-size:24px_24px] opacity-40" />
       </div>
 
-      <div className="relative z-10 max-w-[1360px] w-full mx-auto flex flex-col gap-6">
+      <div className="relative z-10 max-w-6xl w-full mx-auto flex flex-col gap-3.5 sm:gap-4 my-auto">
         {/* Section Header */}
         <div className="flex flex-col items-center text-center mx-auto">
           <motion.h2
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-[#00f4ff] to-[#ffc922]"
+            className="fluid-section-heading font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-[#00f4ff] to-[#ffc922]"
           >
             Skills &amp; Technologies
           </motion.h2>
-          <p className="mt-2 text-gray-400 text-sm max-w-md">
+          <p className="mt-1 text-gray-400 text-xs sm:text-sm max-w-md">
             The languages, frameworks, and tools I use to build fast web apps and intelligent systems.
           </p>
         </div>
 
-        {/* Clean Category Filter Bar */}
+        {/* Clean Category Filter Bar: Fits all 5 pills on 1 clean row */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="flex flex-col gap-1.5 items-center w-full"
+          className="flex items-center justify-center w-full"
         >
-          <div className="w-full max-w-2xl p-1 rounded-xl bg-white/[0.03] border border-white/[0.08] backdrop-blur-xl">
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1 w-full">
-              {SKILL_CATEGORIES.map((cat) => {
-                const isActive = activeCategory === cat.id
-                const CatIcon = cat.icon
+          <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 p-1 sm:p-1.5 rounded-2xl bg-white/[0.03] border border-white/[0.08] backdrop-blur-xl max-w-4xl w-full">
+            {SKILL_CATEGORIES.map((cat) => {
+              const isActive = activeCategory === cat.id
+              const CatIcon = cat.icon
 
-                return (
-                  <button
-                    key={cat.id}
-                    onClick={() => setActiveCategory(cat.id)}
-                    className={`relative px-2 py-2 rounded-lg text-xs font-medium transition-all duration-300 cursor-pointer flex items-center justify-center gap-1.5 text-center select-none ${
-                      isActive
-                        ? 'text-black font-semibold shadow-[0_0_20px_#00f4ff]'
-                        : 'text-gray-300 hover:text-white hover:bg-white/[0.05]'
-                    }`}
-                  >
-                    {isActive && (
-                      <motion.div
-                        layoutId="activeCategoryPill"
-                        className="absolute inset-0 rounded-lg bg-gradient-to-r from-[#00f4ff] via-[#1cd8d2] to-[#ffc922]"
-                        transition={{ type: 'spring', stiffness: 350, damping: 25 }}
-                      />
-                    )}
-                    <CatIcon
-                      className={`w-3.5 h-3.5 shrink-0 relative z-10 transition-colors ${
-                        isActive ? 'text-black' : 'text-cyan-400'
-                      }`}
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => setActiveCategory(cat.id)}
+                  className={`relative px-2.5 sm:px-3.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-medium transition-all duration-300 cursor-pointer flex items-center justify-center gap-1.5 whitespace-nowrap select-none ${
+                    isActive
+                      ? 'text-black font-semibold shadow-[0_0_20px_#00f4ff]'
+                      : 'text-gray-300 hover:text-white hover:bg-white/[0.05]'
+                  }`}
+                >
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeCategoryPill"
+                      className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#00f4ff] via-[#1cd8d2] to-[#ffc922]"
+                      transition={{ type: 'spring', stiffness: 350, damping: 25 }}
                     />
-                    <span className="relative z-10 truncate">{cat.label}</span>
-                  </button>
-                )
-              })}
-            </div>
+                  )}
+                  <CatIcon
+                    className={`w-3.5 h-3.5 shrink-0 relative z-10 transition-colors ${
+                      isActive ? 'text-black' : 'text-cyan-400'
+                    }`}
+                  />
+                  <span className="relative z-10">{cat.label}</span>
+                </button>
+              )
+            })}
           </div>
         </motion.div>
 
-        {/* Skill Cards Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 w-full">
+        {/* Skill Cards Grid: Compact 2x2 layout that fits comfortably on screens above taskbar */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-3.5 w-full">
           {SKILL_MODULES.map((module, mIdx) => {
             const ModuleIcon = module.icon
             return (
@@ -406,7 +404,7 @@ const Skills = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.35, delay: mIdx * 0.05 }}
-                className={`group relative rounded-xl p-4 bg-white/[0.02] border ${module.borderColor} backdrop-blur-2xl transition-all duration-300 hover:shadow-[0_0_25px_rgba(0,244,255,0.1)] flex flex-col justify-between overflow-hidden`}
+                className={`group relative rounded-2xl p-3 sm:p-3.5 bg-white/[0.02] border ${module.borderColor} backdrop-blur-2xl transition-all duration-300 hover:shadow-[0_0_25px_rgba(0,244,255,0.1)] flex flex-col justify-between overflow-hidden`}
               >
                 {/* Background Ambient Glow */}
                 <div
@@ -415,27 +413,27 @@ const Skills = () => {
 
                 <div>
                   {/* Module Header */}
-                  <div className="flex items-center justify-between mb-3 relative z-10">
+                  <div className="flex items-center justify-between mb-2 relative z-10">
                     <div className="flex items-center gap-2">
                       <div
-                        className="p-1.5 rounded-md border border-white/10 bg-white/[0.05]"
+                        className="p-1 rounded-md border border-white/10 bg-white/[0.05]"
                         style={{ color: module.accentColor }}
                       >
-                        <ModuleIcon className="w-4 h-4" />
+                        <ModuleIcon className="w-3.5 h-3.5" />
                       </div>
                       <div>
-                        <h3 className="text-sm font-bold text-white tracking-tight leading-tight">
+                        <h3 className="text-xs sm:text-sm font-bold text-white tracking-tight leading-tight">
                           {module.title}
                         </h3>
-                        <span className="text-[10px] font-mono text-gray-400">
+                        <span className="text-[9.5px] font-mono text-gray-400">
                           {module.badge}
                         </span>
                       </div>
                     </div>
                   </div>
 
-                  {/* Skills Grid */}
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 relative z-10">
+                  {/* Skills Grid: 3 columns x 2 rows = sleek, compact, fits in screen */}
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 relative z-10">
                     {module.skills.map((skill) => {
                       const SkillIcon = skill.icon
                       const isHighlighted =
@@ -447,20 +445,20 @@ const Skills = () => {
                           onClick={() => setSelectedSkill(skill)}
                           whileHover={{ scale: 1.02, y: -1 }}
                           whileTap={{ scale: 0.98 }}
-                          className={`relative px-2.5 py-2 rounded-lg border text-left transition-all duration-200 flex items-center justify-between cursor-pointer ${
+                          className={`relative px-2 py-1.5 rounded-lg border text-left transition-all duration-200 flex items-center justify-between min-h-[36px] cursor-pointer ${
                             isHighlighted
                               ? 'bg-white/[0.04] border-white/10 hover:border-cyan-400/50 hover:bg-cyan-950/30 hover:shadow-[0_0_12px_rgba(0,244,255,0.15)]'
                               : 'opacity-35 grayscale-[50%] bg-black/40 border-white/5 hover:opacity-75'
                           }`}
                         >
                           {/* Icon + Skill Name */}
-                          <div className="flex items-center gap-2 min-w-0 flex-1 mr-1">
+                          <div className="flex items-center gap-1.5 min-w-0 flex-1">
                             <SkillIcon
-                              className={`w-4 h-4 shrink-0 transition-colors ${
+                              className={`w-3.5 h-3.5 shrink-0 transition-colors ${
                                 isHighlighted ? 'text-white' : 'text-gray-500'
                               }`}
                             />
-                            <span className="text-xs font-semibold text-gray-200 truncate">
+                            <span className="text-[11px] sm:text-xs font-semibold text-gray-200 leading-tight">
                               {skill.name}
                             </span>
                           </div>
@@ -476,7 +474,7 @@ const Skills = () => {
                 </div>
 
                 {/* Footer hint */}
-                <div className="mt-3 pt-2 border-t border-white/[0.06] flex items-center justify-between text-[10px] font-mono text-gray-400 relative z-10">
+                <div className="mt-2 pt-1.5 border-t border-white/[0.06] flex items-center justify-between text-[9.5px] font-mono text-gray-400 relative z-10">
                   <span>Click any skill to learn more</span>
                   <span className="text-cyan-400">● Active</span>
                 </div>
@@ -502,7 +500,7 @@ const Skills = () => {
               exit={{ scale: 0.9, y: 20 }}
               transition={{ type: 'spring', stiffness: 350, damping: 25 }}
               onClick={(e) => e.stopPropagation()}
-              className="relative w-full max-w-md p-6 rounded-2xl bg-[#0a0d1a] border border-cyan-400/40 shadow-[0_0_50px_rgba(0,244,255,0.25)] text-white overflow-hidden"
+              className="relative w-full max-w-md max-h-[90vh] overflow-y-auto p-5 sm:p-6 rounded-2xl bg-[#0a0d1a] border border-cyan-400/40 shadow-[0_0_50px_rgba(0,244,255,0.25)] text-white"
             >
               {/* Top Accent Line */}
               <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#00f4ff] via-[#ffc922] to-[#00bf8f]" />
